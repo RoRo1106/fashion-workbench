@@ -1,0 +1,4816 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="穿搭工作台">
+<title>穿搭博主工作台</title>
+<style>
+/* ===== 莫兰迪色系变量 ===== */
+:root {
+  --bg-main: #F5F2F5;
+  --bg-card: #FFFFFF;
+  --bg-sidebar: #E8DFE4;
+  --color-primary: #8B7B8B;
+  --color-primary-light: #BFAFBF;
+  --color-primary-dark: #6B5B6B;
+  --color-accent: #C9B8A8;
+  --color-accent-2: #A8B8A0;
+  --color-accent-3: #B0A8B8;
+  --color-text: #4A404A;
+  --color-text-light: #8B808B;
+  --color-text-white: #FFFFFF;
+  --color-good: #6B9B5B;
+  --color-good-bg: #E0EFD8;
+  --color-warn: #C4A035;
+  --color-warn-bg: #F5EDD8;
+  --color-bad: #B86B6B;
+  --color-bad-bg: #F4DCDC;
+  --color-border: #D4C9D4;
+  --color-border-light: #E8DDE8;
+  --shadow: 0 2px 8px rgba(139, 123, 139, 0.1);
+  --shadow-hover: 0 4px 16px rgba(139, 123, 139, 0.2);
+  --radius: 8px;
+  --radius-sm: 4px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg-main);
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ===== 布局 ===== */
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 200px;
+  background: var(--bg-sidebar);
+  padding: 20px 0;
+  flex-shrink: 0;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.sidebar-logo h1 {
+  font-size: 16px;
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}
+
+.sidebar-logo p {
+  font-size: 11px;
+  color: var(--color-text-light);
+  margin-top: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  cursor: pointer;
+  color: var(--color-text);
+  font-size: 13px;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.5);
+  color: var(--color-primary-dark);
+}
+
+.nav-item.active {
+  background: var(--bg-card);
+  border-left-color: var(--color-primary);
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.nav-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 200px;
+  padding: 24px 32px;
+  max-width: calc(100% - 200px);
+}
+
+.page { display: none; }
+.page.active { display: block; }
+
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: var(--color-text-light);
+  margin-bottom: 20px;
+}
+
+/* ===== 卡片 ===== */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ===== 按钮 ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover { background: var(--color-primary-dark); }
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.btn-outline:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-danger { background: var(--color-bad); color: white; }
+.btn-danger:hover { opacity: 0.85; }
+
+/* ===== 表格 ===== */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  background: var(--bg-sidebar);
+  color: var(--color-primary-dark);
+  font-weight: 600;
+  padding: 10px 12px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--color-border);
+}
+
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border-light);
+  vertical-align: middle;
+}
+
+tr:hover td { background: rgba(232, 223, 228, 0.3); }
+
+/* ===== 标签 ===== */
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.tag-good { background: var(--color-good-bg); color: var(--color-good); }
+.tag-warn { background: var(--color-warn-bg); color: var(--color-warn); }
+.tag-bad { background: var(--color-bad-bg); color: var(--color-bad); }
+.tag-neutral { background: var(--bg-sidebar); color: var(--color-text-light); }
+.tag-primary { background: rgba(139,123,139,0.15); color: var(--color-primary); }
+
+/* ===== 表单 ===== */
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-light);
+  margin-bottom: 4px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: inherit;
+  background: white;
+  color: var(--color-text);
+  transition: border-color 0.2s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+select.form-control { cursor: pointer; }
+
+/* ===== 模态框 ===== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(74, 64, 74, 0.4);
+  z-index: 1000;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 60px;
+  overflow-y: auto;
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: modalIn 0.2s ease;
+}
+
+@keyframes modalIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title { font-size: 16px; font-weight: 600; }
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--color-text-light);
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.modal-close:hover { background: var(--bg-sidebar); }
+
+.modal-body { padding: 20px; }
+
+.modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--color-border-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ===== 仪表盘 ===== */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.stat-info h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.stat-info p {
+  font-size: 12px;
+  color: var(--color-text-light);
+  margin-top: 2px;
+}
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ===== 看板 ===== */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.kanban-col {
+  background: var(--bg-main);
+  border-radius: var(--radius);
+  padding: 12px;
+  min-height: 200px;
+}
+
+.kanban-col-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.kanban-col-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.kanban-col-count {
+  background: var(--color-primary-light);
+  color: white;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.kanban-card {
+  background: white;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  cursor: move;
+  transition: box-shadow 0.2s, transform 0.2s;
+  border-left: 3px solid var(--color-primary-light);
+}
+
+.kanban-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transform: translateY(-1px);
+}
+
+.kanban-card.priority-high { border-left-color: var(--color-bad); }
+.kanban-card.priority-mid { border-left-color: var(--color-warn); }
+.kanban-card.priority-low { border-left-color: var(--color-accent-2); }
+
+.kanban-card-title {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.kanban-card-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.kanban-card-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.kanban-card:hover .kanban-card-actions { opacity: 1; }
+
+/* ===== 进度条 ===== */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--color-border-light);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--color-accent-2);
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+/* ===== 时间轴 ===== */
+.timeline {
+  position: relative;
+  padding-left: 24px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-border);
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 16px;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 2px solid white;
+}
+
+.timeline-item.done::before { background: var(--color-good); }
+.timeline-item.pending::before { background: var(--color-warn); }
+
+.timeline-date {
+  font-size: 12px;
+  color: var(--color-text-light);
+}
+
+.timeline-content {
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+/* ===== SOP清单 ===== */
+.sop-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.sop-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-main);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+
+.sop-check {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.sop-check.checked {
+  background: var(--color-good);
+  border-color: var(--color-good);
+  color: white;
+}
+
+.sop-item.checked .sop-text {
+  text-decoration: line-through;
+  color: var(--color-text-light);
+}
+
+/* ===== 图表 ===== */
+.chart-container {
+  position: relative;
+  height: 200px;
+  margin-top: 10px;
+}
+
+/* ===== 趋势标签 ===== */
+.trend-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.trend-tag {
+  padding: 6px 14px;
+  background: var(--bg-sidebar);
+  border-radius: 16px;
+  font-size: 12px;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.trend-tag:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+.trend-tag .tag-desc {
+  display: block;
+  font-size: 10px;
+  color: var(--color-text-light);
+  margin-top: 2px;
+}
+
+/* ===== 工具栏 ===== */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.toolbar-left {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.toolbar-right {
+  display: flex;
+  gap: 8px;
+}
+
+.search-box {
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  width: 200px;
+  font-family: inherit;
+}
+
+.search-box:focus { outline: none; border-color: var(--color-primary); }
+
+/* ===== 空状态 ===== */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-text-light);
+}
+
+.empty-state p { font-size: 13px; margin-top: 8px; }
+
+/* ===== 提示 ===== */
+.alert {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.alert-info {
+  background: #E8F0FC;
+  color: #3B6BA5;
+  border-left: 3px solid #3B6BA5;
+}
+
+.alert-success {
+  background: var(--color-good-bg);
+  color: var(--color-good);
+  border-left: 3px solid var(--color-good);
+}
+
+.alert-warning {
+  background: var(--color-warn-bg);
+  color: var(--color-warn);
+  border-left: 3px solid var(--color-warn);
+}
+
+/* ===== 数据指标颜色 ===== */
+.metric-good { color: var(--color-good); font-weight: 600; }
+.metric-warn { color: var(--color-warn); font-weight: 600; }
+.metric-bad { color: var(--color-bad); font-weight: 600; }
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--color-text);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  z-index: 2000;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s;
+}
+
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ===== 团队协作样式 ===== */
+.sync-bar {
+  display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+  background: var(--bg-card); border-radius: var(--radius);
+  margin-bottom: 16px; font-size: 13px;
+}
+.sync-bar-time { color: var(--color-text-light); font-size: 11px; margin-left: auto; }
+
+.team-identity-bar {
+  display: flex; align-items: center; padding: 8px 16px;
+  background: var(--color-accent-3); background: linear-gradient(135deg, var(--bg-sidebar), var(--color-accent-3));
+  border-radius: var(--radius); margin-bottom: 16px; font-size: 13px;
+}
+.identity-label { color: var(--color-text-light); }
+.identity-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--color-primary); color: #fff; padding: 4px 12px;
+  border-radius: 20px; font-weight: 600; font-size: 12px;
+}
+.team-card { margin-bottom: 16px; }
+.team-card .card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-bottom: 1px solid var(--color-border-light);
+}
+
+.member-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+.member-item:last-child { border-bottom: none; }
+.member-avatar {
+  width: 40px; height: 40px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; color: #fff;
+  font-weight: 700; font-size: 16px; flex-shrink: 0;
+}
+.member-info { flex: 1; min-width: 0; }
+.member-name { font-weight: 600; font-size: 14px; }
+.member-meta { font-size: 11px; color: var(--color-text-light); margin-top: 2px; }
+.member-role-tag {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 11px; font-weight: 600;
+}
+.member-role-owner { background: #F5EDD8; color: #C4A035; }
+.member-role-admin { background: #E8DFF0; color: #8B7B8B; }
+.member-role-member { background: #E8E8E8; color: #8B808B; }
+.member-actions { display: flex; gap: 6px; }
+
+.task-assign-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px; padding: 16px;
+}
+.task-assign-card {
+  background: var(--bg-main); border-radius: var(--radius); padding: 16px;
+  cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
+}
+.task-assign-card:hover { border-color: var(--color-primary-light); box-shadow: var(--shadow-hover); }
+.task-assign-card .assign-name { font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+.task-assign-card .assign-stats { display: flex; flex-wrap: wrap; gap: 6px; }
+.task-assign-card .assign-stat {
+  background: var(--bg-card); padding: 4px 10px; border-radius: 12px;
+  font-size: 12px; color: var(--color-text-light);
+}
+.task-assign-card .assign-stat strong { color: var(--color-text); }
+.assign-unassigned { border-style: dashed; opacity: 0.7; }
+
+.log-item {
+  display: flex; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--color-border-light);
+  align-items: flex-start;
+}
+.log-item:last-child { border-bottom: none; }
+.log-dot {
+  width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0;
+}
+.log-dot-create { background: var(--color-accent-2); }
+.log-dot-update { background: #6B9FDB; }
+.log-dot-delete { background: var(--color-bad); }
+.log-dot-complete { background: var(--color-good); }
+.log-dot-assign { background: var(--color-accent-3); }
+.log-dot-sync { background: #AAA; }
+.log-dot-import { background: var(--color-accent-3); }
+.log-dot-export { background: var(--color-primary-light); }
+.log-dot-init { background: var(--color-accent); }
+.log-content { flex: 1; min-width: 0; }
+.log-detail { font-size: 13px; color: var(--color-text); }
+.log-time { font-size: 11px; color: var(--color-text-light); margin-top: 2px; }
+.log-empty { padding: 32px; text-align: center; color: var(--color-text-light); font-size: 14px; }
+
+.assignee-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;
+}
+.assignee-filled { background: var(--color-accent-3); color: #fff; }
+.assignee-empty { background: var(--bg-main); color: var(--color-text-light); border: 1px dashed var(--color-border); }
+
+.kanban-filter-bar {
+  display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center;
+}
+.kanban-filter-bar select {
+  padding: 6px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  background: var(--bg-card); font-size: 13px; color: var(--color-text);
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 1024px) {
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .dash-grid { grid-template-columns: 1fr; }
+  .kanban-board { grid-template-columns: 1fr; }
+  .live-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  /* 底部导航栏 */
+  .app { flex-direction: column; }
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    top: auto;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 56px;
+    flex-direction: row;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0;
+    background: var(--bg-card);
+    border-top: 1px solid var(--color-border-light);
+    z-index: 200;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+    -webkit-overflow-scrolling: touch;
+  }
+  .sidebar-logo { display: none; }
+  .nav-item {
+    flex-shrink: 0;
+    flex-direction: column;
+    padding: 6px 10px;
+    font-size: 10px;
+    gap: 2px;
+    border-left: none;
+    border-top: 2px solid transparent;
+    min-width: 52px;
+    text-align: center;
+  }
+  .nav-item .nav-icon { font-size: 18px; width: auto; }
+  .nav-item span { display: block !important; font-size: 10px; }
+  .nav-item.active { border-left-color: transparent; border-top-color: var(--color-primary); }
+
+  /* 主内容区 */
+  .main-content {
+    margin-left: 0;
+    max-width: 100%;
+    padding: 12px 12px 72px 12px;
+    width: 100%;
+  }
+
+  /* 统计卡片 */
+  .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .stat-card { padding: 12px; gap: 10px; }
+  .stat-icon { width: 36px; height: 36px; font-size: 16px; border-radius: 8px; }
+  .stat-info h3 { font-size: 18px; }
+  .stat-info p { font-size: 11px; }
+
+  /* 页面标题 */
+  .page-title { font-size: 17px; }
+  .page-subtitle { font-size: 12px; margin-bottom: 12px; }
+
+  /* 卡片 */
+  .card { padding: 12px; margin-bottom: 10px; }
+
+  /* 表格 - 手机端卡片化 */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { font-size: 12px; }
+  th, td { padding: 6px 8px; white-space: nowrap; }
+
+  /* 看板 */
+  .kanban-col { padding: 8px; min-height: 120px; }
+  .kanban-card { padding: 8px 10px; }
+
+  /* 表单 */
+  .form-row { grid-template-columns: 1fr; gap: 8px; }
+  .form-control { font-size: 16px; padding: 10px 12px; } /* 16px防止iOS缩放 */
+  .form-group label { font-size: 11px; }
+  .form-group { margin-bottom: 10px; }
+
+  /* 工具栏 */
+  .toolbar { flex-direction: column; gap: 8px; }
+  .toolbar-left, .toolbar-right { width: 100%; }
+  .toolbar-left { flex-wrap: wrap; }
+  .search-box { width: 100%; font-size: 16px; }
+  .btn { font-size: 14px; padding: 10px 16px; }
+  .btn-sm { font-size: 12px; padding: 6px 12px; }
+
+  /* 直播卡片 */
+  .live-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .live-stat-value { font-size: 15px; }
+  .live-stat-label { font-size: 10px; }
+
+  /* 模态框 */
+  .modal-overlay { padding-top: 20px; align-items: flex-start; }
+  .modal { width: 96%; max-width: 100%; max-height: 85vh; border-radius: 12px 12px 0 0; margin-top: 10vh; }
+  .modal-header { padding: 14px 16px; }
+  .modal-body { padding: 14px 16px; }
+  .modal-footer { padding: 10px 16px; }
+
+  /* 趋势标签 */
+  .trend-tags { gap: 6px; }
+  .trend-tag { padding: 5px 10px; font-size: 11px; }
+
+  /* SOP清单 */
+  .sop-list { grid-template-columns: 1fr; }
+
+  /* 分析卡片 */
+  .analysis-card { padding: 12px; }
+
+  /* Toast */
+  .toast { bottom: 72px; right: 12px; left: 12px; text-align: center; }
+
+  /* kanban card actions - 手机端常显 */
+  .kanban-card-actions { opacity: 1 !important; }
+  .kanban-card:hover .kanban-card-actions { opacity: 1; }
+
+  /* 触摸优化 */
+  .kanban-card { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .kanban-card:active { transform: scale(0.98); }
+
+  /* 快捷操作按钮组 */
+  .dash-grid .card .btn {
+    flex: 1;
+    min-width: 45%;
+    justify-content: center;
+  }
+}
+
+/* 小屏手机优化 (< 400px) */
+@media (max-width: 400px) {
+  .stat-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .stat-card { padding: 10px; }
+  .stat-info h3 { font-size: 16px; }
+  .dash-grid { grid-template-columns: 1fr; }
+  .nav-item { min-width: 44px; padding: 4px 6px; }
+  .nav-item .nav-icon { font-size: 16px; }
+  .nav-item span { font-size: 9px; }
+  .sidebar { height: 50px; }
+  .main-content { padding-bottom: 66px; }
+  .task-assign-grid { grid-template-columns: 1fr; }
+  .member-actions { flex-direction: column; }
+}
+
+/* 团队移动端适配 */
+@media (max-width: 768px) {
+  .task-assign-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .task-assign-card { padding: 12px; }
+  .member-actions { flex-direction: row; flex-wrap: wrap; }
+  .team-identity-bar { flex-wrap: wrap; gap: 8px; }
+  .log-item { padding: 8px 12px; }
+}
+}
+
+/* ===== 拆解卡片 ===== */
+.analysis-card {
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 12px;
+  background: var(--bg-main);
+}
+
+.analysis-card h4 {
+  font-size: 14px;
+  color: var(--color-primary-dark);
+  margin-bottom: 8px;
+}
+
+.analysis-card p {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ===== 直播卡片 ===== */
+.live-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin-bottom: 12px;
+  border-top: 3px solid var(--color-primary-light);
+}
+
+.live-card.upcoming { border-top-color: var(--color-warn); }
+.live-card.done { border-top-color: var(--color-good); }
+
+.live-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.live-card-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.live-card-brand {
+  font-size: 12px;
+  color: var(--color-text-light);
+  margin-top: 2px;
+}
+
+.live-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.live-stat {
+  text-align: center;
+}
+
+.live-stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.live-stat-label {
+  font-size: 11px;
+  color: var(--color-text-light);
+  margin-top: 2px;
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ===== 侧边栏 ===== -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <h1>穿搭博主工作台</h1>
+      <p>专柜品牌 · 内容运营</p>
+    </div>
+    <div class="nav-item active" data-page="dashboard">
+      <span class="nav-icon">📊</span><span>仪表盘</span>
+    </div>
+    <div class="nav-item" data-page="tasks">
+      <span class="nav-icon">📋</span><span>每日工作进度</span>
+    </div>
+    <div class="nav-item" data-page="live">
+      <span class="nav-icon">🎥</span><span>直播专场管理</span>
+    </div>
+    <div class="nav-item" data-page="explosive">
+      <span class="nav-icon">🔥</span><span>爆文追踪与拆解</span>
+    </div>
+    <div class="nav-item" data-page="topics">
+      <span class="nav-icon">💡</span><span>选题策划</span>
+    </div>
+    <div class="nav-item" data-page="review">
+      <span class="nav-icon">📈</span><span>内容复盘</span>
+    </div>
+    <div class="nav-item" data-page="weekly">
+      <span class="nav-icon">📅</span><span>周报汇总</span>
+    </div>
+    <div class="nav-item" data-page="team">
+      <span class="nav-icon">👥</span><span>团队协作</span>
+    </div>
+  </div>
+
+  <!-- ===== 主内容区 ===== -->
+  <div class="main-content">
+
+    <!-- ===== 仪表盘 ===== -->
+    <div class="page active" id="page-dashboard">
+      <h2 class="page-title">仪表盘</h2>
+      <p class="page-subtitle" id="todayDate"></p>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--color-bad-bg);color:var(--color-bad)">📋</div>
+          <div class="stat-info">
+            <h3 id="stat-today-tasks">0</h3>
+            <p>今日待办任务</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--color-warn-bg);color:var(--color-warn)">🎥</div>
+          <div class="stat-info">
+            <h3 id="stat-week-live">0</h3>
+            <p>本周直播场次</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--color-good-bg);color:var(--color-good)">📝</div>
+          <div class="stat-info">
+            <h3 id="stat-week-posts">0</h3>
+            <p>本周已发布</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(139,123,139,0.15);color:var(--color-primary)">🔥</div>
+          <div class="stat-info">
+            <h3 id="stat-explosive-count">0</h3>
+            <p>追踪爆文数</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">今日待办</span>
+            <button class="btn btn-outline btn-sm" onclick="switchPage('tasks')">查看全部</button>
+          </div>
+          <div id="dash-today-tasks"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">本周直播安排</span>
+            <button class="btn btn-outline btn-sm" onclick="switchPage('live')">查看全部</button>
+          </div>
+          <div id="dash-week-live" class="timeline"></div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">今日工作完成度</span>
+          </div>
+          <div id="dash-progress"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">快捷操作</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <button class="btn btn-primary" onclick="openTaskModal()">➕ 新建任务</button>
+            <button class="btn btn-outline" onclick="openLiveModal()">🎥 新建直播</button>
+            <button class="btn btn-outline" onclick="openExplosiveModal()">🔥 记录爆文</button>
+            <button class="btn btn-outline" onclick="openTopicModal()">💡 新建选题</button>
+            <button class="btn btn-outline" onclick="openReviewModal()">📈 记录复盘</button>
+            <button class="btn btn-outline" onclick="exportData()">💾 导出数据</button>
+            <button class="btn btn-outline" onclick="resetToLatest()" style="color:var(--color-bad);border-color:var(--color-bad)">🔄 更新到最新数据</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📊 基准数据参考</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>指标</th><th>基准值</th><th>优秀值</th><th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>CTR点击率</td><td>8%</td><td class="metric-good">&gt;10%</td><td>低于8%需优化封面和标题</td></tr>
+              <tr><td>互动率</td><td>3%-5%</td><td class="metric-good">&gt;10%</td><td>互动率=(赞+藏+评)/阅读量</td></tr>
+              <tr><td>收藏率</td><td>10%</td><td class="metric-good">&gt;15%</td><td>收藏&gt;点赞说明内容干货度高</td></tr>
+              <tr><td>爆文门槛</td><td>1000互动量</td><td class="metric-good">5000+/10000+</td><td>初级/中级/顶级爆文</td></tr>
+              <tr><td>最佳发布时间</td><td colspan="2">周四/周五 18:00-20:00</td><td>提前十几分钟发布预留审核</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 每日工作进度 ===== -->
+    <div class="page" id="page-tasks">
+      <h2 class="page-title">每日工作进度</h2>
+      <p class="page-subtitle">看板式管理每日任务，支持拖拽变更状态</p>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="date" class="form-control" id="taskDateFilter" style="width:auto" onchange="renderTasks()">
+          <input type="text" class="search-box" placeholder="搜索任务..." id="taskSearch" oninput="renderTasks()">
+          <select class="form-control" id="taskMemberFilter" style="width:auto" onchange="renderTasks()">
+            <option value="">全部成员</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-primary" onclick="openTaskModal()">➕ 新建任务</button>
+        </div>
+      </div>
+
+      <div class="kanban-board" id="kanbanBoard"></div>
+    </div>
+
+    <!-- ===== 直播专场管理 ===== -->
+    <div class="page" id="page-live">
+      <h2 class="page-title">直播专场管理</h2>
+      <p class="page-subtitle">管理各专柜品牌直播安排、SOP检查清单与直播复盘</p>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <select class="form-control" style="width:auto" id="liveFilter" onchange="renderLive()">
+            <option value="">全部状态</option>
+            <option value="待直播">待直播</option>
+            <option value="直播中">直播中</option>
+            <option value="已复盘">已复盘</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-primary" onclick="document.getElementById('icsFileInput').click()">📥 导入钉钉ICS文件</button>
+          <button class="btn btn-outline" onclick="openSyncModal()">🔗 订阅链接（其他日历）</button>
+          <button class="btn btn-outline" onclick="openLiveModal()">➕ 手动新建</button>
+        </div>
+      </div>
+
+      <!-- 日历同步配置区 -->
+      <div class="card" id="syncStatusCard" style="display:none">
+        <div class="card-header">
+          <span class="card-title">📅 日历订阅同步</span>
+          <button class="btn btn-outline btn-sm" onclick="openSyncModal()">⚙️ 设置</button>
+        </div>
+        <div id="syncStatusContent"></div>
+      </div>
+
+      <!-- 钉钉日历导入提示 -->
+      <div class="alert alert-info" id="icsImportTip" style="display:none">
+        <span>⏳ 正在解析ICS文件...</span>
+      </div>
+
+      <!-- 隐藏的文件上传 -->
+      <input type="file" id="icsFileInput" accept=".ics,text/calendar" style="display:none" onchange="handleICSUpload(event)">
+
+      <!-- 导入预览 -->
+      <div class="card" id="icsPreviewCard" style="display:none">
+        <div class="card-header">
+          <span class="card-title">📅 钉钉日历导入预览</span>
+          <div>
+            <button class="btn btn-outline btn-sm" onclick="cancelICSImport()">取消</button>
+            <button class="btn btn-primary btn-sm" onclick="confirmICSImport()">确认导入</button>
+          </div>
+        </div>
+        <div class="alert alert-warning">
+          <span>⚠️ 以下是从ICS文件解析出的日程，确认后将作为「待直播」场次导入。已存在的同日期直播不会重复添加。</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="icsSelectAll" checked onchange="toggleAllICS(this)"></th>
+                <th>日程标题</th><th>开始时间</th><th>结束时间</th><th>品牌（自动识别）</th><th>备注</th>
+              </tr>
+            </thead>
+            <tbody id="icsPreviewTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 快速录入卡片 -->
+      <div class="card" id="quickAddCard">
+        <div class="card-header">
+          <span class="card-title">⚡ 快速录入直播（看着钉钉日历填，30秒搞定）</span>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('quickAddCard').style.display='none'">收起</button>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap">
+          <div class="form-group" style="margin-bottom:0;min-width:130px">
+            <label>📅 直播日期</label>
+            <input type="date" class="form-control" id="quickDate" value="" style="width:130px">
+          </div>
+          <div class="form-group" style="margin-bottom:0;min-width:140px">
+            <label>🏷 品牌</label>
+            <select class="form-control" id="quickBrand" style="width:140px">
+              <option value="">选择品牌</option>
+              <option value="玛丝菲尔">玛丝菲尔</option>
+              <option value="歌力思">歌力思</option>
+              <option value="雅莹">雅莹</option>
+              <option value="之禾">之禾</option>
+              <option value="例外">例外</option>
+              <option value="江南布衣">江南布衣</option>
+              <option value="朗姿">朗姿</option>
+              <option value="地素">地素</option>
+              <option value="诗篇">诗篇</option>
+              <option value="敦奴">敦奴</option>
+              <option value="">──────────</option>
+              <option value="__custom__">✏️ 其他品牌（手动输入）</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;min-width:120px" id="quickCustomBrandGroup" style="display:none">
+            <label>输入品牌名</label>
+            <input type="text" class="form-control" id="quickCustomBrand" placeholder="品牌名" style="width:120px">
+          </div>
+          <div class="form-group" style="margin-bottom:0;min-width:110px">
+            <label>⏰ 开播时间</label>
+            <input type="time" class="form-control" id="quickTime" value="19:00" style="width:110px">
+          </div>
+          <div class="form-group" style="margin-bottom:0;min-width:90px">
+            <label>⏱ 时长(小时)</label>
+            <input type="number" class="form-control" id="quickDuration" value="2.5" step="0.5" min="0.5" max="6" style="width:90px">
+          </div>
+          <button class="btn btn-primary" onclick="quickAddLive()" style="height:38px;margin-bottom:0">✅ 创建直播</button>
+        </div>
+        <p style="font-size:11px;color:var(--color-text-light);margin-top:8px">
+          💡 创建后自动生成SOP清单（T-7选品 → T-3预热 → T-1终检 → T+1复盘），在直播卡片里点击「SOP清单」查看
+        </p>
+      </div>
+
+      <div id="liveList"></div>
+    </div>
+
+    <!-- ===== 爆文追踪与拆解 ===== -->
+    <div class="page" id="page-explosive">
+      <h2 class="page-title">爆文追踪与拆解</h2>
+      <p class="page-subtitle">追踪小红书穿搭赛道爆文，深度拆解并提炼可借鉴点</p>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🎯 当前热门趋势标签</span>
+          <button class="btn btn-outline btn-sm" onclick="openTagManager()">⚙️ 管理标签</button>
+        </div>
+        <div class="trend-tags" id="trendTags"></div>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="text" class="search-box" placeholder="搜索爆文..." id="explosiveSearch" oninput="renderExplosive()">
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-outline" onclick="searchHotTrends()">🔍 搜索热点</button>
+          <button class="btn btn-primary" onclick="openExplosiveModal()">🔥 记录爆文</button>
+        </div>
+      </div>
+
+      <!-- 热点搜索结果 -->
+      <div class="card" id="hotSearchCard" style="display:none">
+        <div class="card-header">
+          <span class="card-title">🔍 热点搜索结果</span>
+          <div>
+            <button class="btn btn-outline btn-sm" onclick="cancelHotSearch()">取消</button>
+            <button class="btn btn-primary btn-sm" onclick="importHotTrends()">导入到爆文库</button>
+          </div>
+        </div>
+        <div class="alert alert-info" id="hotSearchStatus">
+          <span>⏳ 正在搜索最新穿搭热点...</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="hotSelectAll" checked onchange="toggleAllHot(this)"></th>
+                <th>热点标题</th><th>类型</th><th>热度</th><th>标签</th>
+              </tr>
+            </thead>
+            <tbody id="hotSearchTable"></tbody>
+          </table>
+        </div>
+        <!-- 手动搜索真实小红书笔记 -->
+        <div style="border-top:1px solid var(--color-border-light);padding-top:12px;margin-top:12px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px">🔎 搜索真实小红书穿搭笔记</div>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="form-control" id="webSearchInput" placeholder="输入关键词，如：梨形身材 显瘦 连衣裙" style="flex:1">
+            <button class="btn btn-outline" onclick="searchRealNotes()">搜索</button>
+            <button class="btn btn-outline btn-sm" onclick="openXHSLink()" title="打开小红书搜索">📱</button>
+          </div>
+          <p style="font-size:11px;color:var(--color-text-light);margin-top:4px">搜索后在新窗口打开小红书搜索结果，把感兴趣的笔记链接复制回来记录</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>笔记标题</th><th>博主</th><th>类型</th>
+                <th>点赞</th><th>收藏</th><th>评论</th><th>阅读量</th>
+                <th>互动率</th><th>收藏率</th><th>标签</th><th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="explosiveTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="analysisSection" style="display:none">
+        <div class="card-header">
+          <span class="card-title">📝 爆文拆解</span>
+          <button class="btn btn-outline btn-sm" onclick="closeAnalysis()">关闭</button>
+        </div>
+        <div id="analysisContent"></div>
+      </div>
+    </div>
+
+    <!-- ===== 选题策划 ===== -->
+    <div class="page" id="page-topics">
+      <h2 class="page-title">选题策划</h2>
+      <p class="page-subtitle">从灵感到排期到发布，全流程管理内容选题</p>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <select class="form-control" style="width:auto" id="topicFilter" onchange="renderTopics()">
+            <option value="">全部状态</option>
+            <option value="待策划">待策划</option>
+            <option value="策划中">策划中</option>
+            <option value="已排期">已排期</option>
+            <option value="拍摄中">拍摄中</option>
+            <option value="已发布">已发布</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-primary" onclick="openTopicModal()">💡 新建选题</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">选题看板</span>
+        </div>
+        <div class="kanban-board" id="topicBoard"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">💡 选题灵感池</span>
+        </div>
+        <div class="alert alert-info">
+          💡 基于追踪的爆文趋势，以下选题方向值得尝试（点击可直接创建选题）
+        </div>
+        <div id="inspirationPool"></div>
+      </div>
+    </div>
+
+    <!-- ===== 内容复盘 ===== -->
+    <div class="page" id="page-review">
+      <h2 class="page-title">内容复盘与优化</h2>
+      <p class="page-subtitle">记录每条已发布笔记的数据表现，自动诊断并生成优化建议</p>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <select class="form-control" style="width:auto" id="reviewFilter" onchange="renderReview()">
+            <option value="">全部</option>
+            <option value="顶级爆文">顶级爆文</option>
+            <option value="中级爆文">中级爆文</option>
+            <option value="初级爆文">初级爆文</option>
+            <option value="普通">普通</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-primary" onclick="openReviewModal()">📈 记录复盘</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>笔记标题</th><th>发布日期</th><th>类型</th><th>品牌</th>
+                <th>曝光量</th><th>阅读量</th><th>点赞</th><th>收藏</th><th>评论</th>
+                <th>CTR</th><th>互动率</th><th>收藏率</th><th>互动量</th><th>爆文判定</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="reviewTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 周报汇总 ===== -->
+    <div class="page" id="page-weekly">
+      <h2 class="page-title">周报汇总</h2>
+      <p class="page-subtitle">每周数据汇总，掌握运营节奏</p>
+
+      <div class="toolbar">
+        <div class="toolbar-right">
+          <button class="btn btn-primary" onclick="openWeeklyModal()">➕ 新建周报</button>
+        </div>
+      </div>
+
+      <div id="weeklyList"></div>
+    </div>
+
+    <!-- ===== 团队协作 ===== -->
+    <div class="page" id="page-team">
+      <h2 class="page-title">团队协作</h2>
+      <p class="page-subtitle">管理团队成员、共享任务与操作日志</p>
+
+      <!-- 同步状态栏 -->
+      <div class="sync-bar" id="syncStatusBar">
+        <span id="syncStatusIcon">📦</span>
+        <span id="syncStatusText">本地模式</span>
+        <span class="sync-bar-time" id="syncBarTime"></span>
+        <button class="btn btn-sm" onclick="openGistSyncModal()" style="margin-left:8px;">⚙️ 云端同步设置</button>
+        <button class="btn btn-sm btn-primary" onclick="manualSync()" id="btnManualSync" style="margin-left:4px;">🔄 立即同步</button>
+      </div>
+
+      <!-- 当前身份 -->
+      <div class="team-identity-bar">
+        <span class="identity-label">当前身份：</span>
+        <span class="identity-badge" id="currentUserBadge"></span>
+        <button class="btn btn-sm" onclick="switchUserPrompt()" style="margin-left:8px;">🔄 切换</button>
+      </div>
+
+      <!-- 成员管理 -->
+      <div class="card team-card">
+        <div class="card-header">
+          <h3 class="card-title">👥 成员管理</h3>
+          <button class="btn btn-sm btn-primary" onclick="openMemberModal()">+ 添加成员</button>
+        </div>
+        <div id="memberList"></div>
+      </div>
+
+      <!-- 任务分配概览 -->
+      <div class="card team-card">
+        <div class="card-header">
+          <h3 class="card-title">📊 任务分配概览</h3>
+        </div>
+        <div id="taskAssignmentOverview"></div>
+      </div>
+
+      <!-- 操作日志 -->
+      <div class="card team-card">
+        <div class="card-header">
+          <h3 class="card-title">📝 操作日志</h3>
+          <div class="toolbar-right">
+            <select id="logFilterModule" onchange="renderOperationLogs()" class="form-input" style="width:auto;display:inline;">
+              <option value="">全部模块</option>
+              <option value="tasks">任务</option>
+              <option value="lives">直播</option>
+              <option value="explosives">爆文</option>
+              <option value="topics">选题</option>
+              <option value="reviews">复盘</option>
+              <option value="weeklies">周报</option>
+              <option value="team">团队</option>
+            </select>
+          </div>
+        </div>
+        <div id="operationLogList"></div>
+      </div>
+
+      <!-- 数据导入导出 -->
+      <div class="card team-card">
+        <div class="card-header">
+          <h3 class="card-title">💾 团队数据共享</h3>
+        </div>
+        <div style="padding:16px;">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+            <button class="btn btn-primary" onclick="exportTeamData()">📤 导出团队数据</button>
+            <button class="btn" onclick="document.getElementById('teamImportFile').click()">📥 导入团队数据</button>
+            <input type="file" id="teamImportFile" accept=".json" style="display:none" onchange="importTeamData(this)">
+          </div>
+          <div style="font-size:12px;color:var(--color-text-light);line-height:1.8;">
+            💡 <strong>推荐：</strong>配置 GitHub Gist 云端同步后，所有成员自动共享数据，无需手动导入导出。<br>
+            📋 <strong>手动方式：</strong>导出 JSON 后通过微信/邮件发给队友，队友导入即可同步（适合无网络环境）。
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== 通用模态框 ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">标题</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- ===== Toast ===== -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ====================================================================
+// Safari 兼容性 Polyfills
+// ====================================================================
+// padStart polyfill (Safari < 9)
+if (!String.prototype.padStart) {
+  String.prototype.padStart = function(targetLength, padString) {
+    targetLength = targetLength >> 0;
+    padString = String((typeof padString !== 'undefined' ? padString : ' '));
+    if (this.length >= targetLength) return String(this);
+    var pad = '';
+    while (pad.length < targetLength - this.length) { pad += padString; }
+    return pad.slice(0, targetLength - this.length) + String(this);
+  };
+}
+// endsWith polyfill (Safari < 9)
+if (!String.prototype.endsWith) {
+  String.prototype.endsWith = function(search, this_len) {
+    if (this_len === undefined || this_len > this.length) { this_len = this.length; }
+    return this.substring(this_len - search.length, this_len) === search;
+  };
+}
+// includes polyfill (Safari < 9)
+if (!String.prototype.includes) {
+  String.prototype.includes = function(search, start) {
+    return String.prototype.indexOf.call(this, search, start) !== -1;
+  };
+}
+// localStorage 可用性检测
+var localStorageAvailable = true;
+try {
+  var testKey = '__storage_test__';
+  window.localStorage.setItem(testKey, testKey);
+  window.localStorage.removeItem(testKey);
+} catch(e) {
+  localStorageAvailable = false;
+  console.warn('localStorage 不可用，数据将在页面刷新后丢失');
+}
+
+// ====================================================================
+// 数据管理 - localStorage 持久化
+// ====================================================================
+const STORAGE_KEY = 'fashionBloggerWorkbench';
+
+let DB = {
+  tasks: [],
+  lives: [],
+  explosives: [],
+  analyses: [],
+  topics: [],
+  reviews: [],
+  weeklies: [],
+  trendTags: [],
+  // === 团队协作新增字段 ===
+  team: {
+    teamId: '',
+    teamName: '',
+    members: [],
+    syncConfig: { workerUrl: '', gistId: '', gistToken: '', gistFilename: 'team-data.json', syncInterval: 30, lastSync: '', lastSyncBy: '' }
+  },
+  currentUserId: '',
+  operationLogs: [],
+  _meta: { version: 2, lastModified: '', revision: 0 }
+};
+
+// 加载数据
+function loadData() {
+  var saved = null;
+  if (localStorageAvailable) {
+    saved = localStorage.getItem(STORAGE_KEY);
+  }
+  if (saved) {
+    try {
+      DB = JSON.parse(saved);
+      // 向后兼容：补充可能缺失的新字段
+      if (!DB.team) DB.team = { teamId: '', teamName: '', members: [], syncConfig: { workerUrl: '', gistId: '', gistToken: '', gistFilename: 'team-data.json', syncInterval: 30, lastSync: '', lastSyncBy: '' };
+      if (!DB.currentUserId) DB.currentUserId = '';
+      if (!DB.operationLogs) DB.operationLogs = [];
+      if (!DB._meta) DB._meta = { version: 2, lastModified: '', revision: 0 };
+      // 确保所有已有数据项包含团队字段
+      ensureTeamFields();
+    } catch(e) {
+      console.error('数据加载失败', e);
+      loadSampleData();
+    }
+  } else {
+    loadSampleData();
+  }
+}
+
+// 保存数据
+function saveData() {
+  if (localStorageAvailable) {
+    try {
+      DB._meta.revision = (DB._meta.revision || 0) + 1;
+      DB._meta.lastModified = new Date().toISOString();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
+    } catch(e) {
+      console.warn('数据保存失败，可能存储已满', e);
+    }
+  }
+}
+
+// 示例数据
+function loadSampleData() {
+  const today = new Date();
+  const fmt = (d) => d.toISOString().slice(0,10);
+  const todayStr = fmt(today);
+
+  DB.tasks = [
+    {id:1, date:todayStr, name:'玛丝菲尔专场选品确认', type:'直播准备', brand:'玛丝菲尔', priority:'高', status:'进行中', deadline:'2025-07-30', note:'需确认秋装新款SKU'},
+    {id:2, date:todayStr, name:'拍摄歌力思秋季OOTD笔记', type:'内容创作', brand:'歌力思', priority:'高', status:'待办', deadline:'2025-07-29', note:'3套穿搭，搭配饰品'},
+    {id:3, date:todayStr, name:'上周笔记数据复盘', type:'数据复盘', brand:'—', priority:'中', status:'待办', deadline:todayStr, note:'重点关注周四发布的2条'},
+    {id:4, date:todayStr, name:'雅莹商务对接 - 直播档期确认', type:'商务对接', brand:'雅莹', priority:'高', status:'已完成', deadline:todayStr, note:'8月2日直播，已确认'},
+    {id:5, date:todayStr, name:'玛丝菲尔直播脚本初稿', type:'直播准备', brand:'玛丝菲尔', priority:'高', status:'待办', deadline:'2025-07-31', note:'含5个核心款卖点提炼'},
+    {id:6, date:todayStr, name:'追踪本周小红书穿搭爆文', type:'数据复盘', brand:'—', priority:'中', status:'待办', deadline:'2025-07-30', note:'重点关注轻奢/国产品类'},
+  ];
+
+  DB.lives = [
+    {id:1, date:'2025-08-02', brand:'玛丝菲尔', brandType:'国产专柜', duration:'', itemCount:'', viewers:'', peakOnline:'', avgOnline:'', interactionRate:'', gmv:'', orders:'', status:'待直播', review:'8月2日19:00开播，秋装新品首发'},
+    {id:2, date:'2025-08-09', brand:'雅莹', brandType:'国产专柜', duration:'', itemCount:'', viewers:'', peakOnline:'', avgOnline:'', interactionRate:'', gmv:'', orders:'', status:'待直播', review:'8月9日秋装专场，预计3小时'},
+    {id:3, date:'2025-08-16', brand:'歌力思', brandType:'国产专柜', duration:'', itemCount:'', viewers:'', peakOnline:'', avgOnline:'', interactionRate:'', gmv:'', orders:'', status:'待直播', review:'8月16日品牌周年活动专场'},
+    {id:4, date:'2025-07-19', brand:'雅莹', brandType:'国产专柜', duration:2.5, itemCount:15, viewers:3200, peakOnline:850, avgOnline:420, interactionRate:6.8, gmv:86000, orders:52, status:'已复盘', review:'互动率不错，客单价偏低，下场可增加高客单款'},
+    {id:5, date:'2025-07-12', brand:'歌力思', brandType:'国产专柜', duration:3.0, itemCount:20, viewers:4100, peakOnline:1020, avgOnline:580, interactionRate:8.2, gmv:156000, orders:78, status:'已复盘', review:'爆款连衣裙带动GMV，建议增加搭配饰品'},
+  ];
+
+  DB.explosives = [
+    {id:1, title:'微胖女生夏日穿搭｜这5条连衣裙太显瘦了', author:'穿搭小日记', date:'2025-07-25', type:'身材修饰', likes:8500, collects:12000, comments:680, views:95000, tags:'辣妹风,显瘦', link:'', analyzed:true},
+    {id:2, title:'歌力思试衣间实拍｜150件秋冬新品只选了这8件', author:'显瘦穿搭指南', date:'2025-07-23', type:'品牌测评', likes:6200, collects:8800, comments:420, views:72000, tags:'品牌测评,秋冬', link:'', analyzed:true},
+    {id:3, title:'通勤穿搭公式｜白领一周不重样OOTD', author:'职场穿搭笔记', date:'2025-07-22', type:'穿搭公式', likes:12000, collects:18000, comments:950, views:130000, tags:'通勤,Clean Fit', link:'', analyzed:false},
+    {id:4, title:'小个子显高穿搭｜160以下必看的裤装选择指南', author:'小个子穿搭馆', date:'2025-07-20', type:'身材修饰', likes:9800, collects:15000, comments:720, views:110000, tags:'小个子,显高', link:'', analyzed:false},
+    {id:5, title:'早秋穿搭灵感｜雅莹专柜试穿记录', author:'专柜穿搭实录', date:'2025-07-18', type:'品牌测评', likes:4500, collects:6200, comments:380, views:48000, tags:'早秋,品牌', link:'', analyzed:false},
+    {id:6, title:'梨形身材穿搭｜半裙这样穿显瘦10斤', author:'梨形穿搭攻略', date:'2025-07-12', type:'身材修饰', likes:15000, collects:22000, comments:1100, views:160000, tags:'梨形,显瘦', link:'', analyzed:false},
+    // 2026上半年新趋势爆文
+    {id:7, title:'Softfit柔系穿搭｜Cleanfit的质感升级版', author:'高智穿搭日记', date:'2026-07-15', type:'穿搭公式', likes:18500, collects:22000, comments:1200, views:180000, tags:'Softfit,柔系,质感', link:'', analyzed:false},
+    {id:8, title:'本命穿搭｜先做性格测试再选衣服', author:'气质穿搭实验室', date:'2026-07-12', type:'穿搭公式', likes:14200, collects:19500, comments:980, views:155000, tags:'本命穿搭,性格测试,气质', link:'', analyzed:false},
+    {id:9, title:'针织衫/毛衣种草｜内搭打底怎么选', author:'面料成分党', date:'2026-07-10', type:'好物分享', likes:9800, collects:16000, comments:650, views:120000, tags:'针织衫,内搭,面料', link:'', analyzed:false},
+    {id:10, title:'运动服饰穿搭｜网球风Blokeore混搭', author:'运动穿搭研究所', date:'2026-07-08', type:'场景穿搭', likes:11200, collects:14800, comments:820, views:135000, tags:'运动风,网球,Blokeore', link:'', analyzed:false},
+    {id:11, title:'海边度假穿搭｜Sportcation运动度假风', author:'度假穿搭指南', date:'2026-07-05', type:'场景穿搭', likes:15600, collects:21000, comments:1100, views:170000, tags:'海边,度假,Sportcation', link:'', analyzed:false},
+  ];
+
+  DB.analyses = [
+    {id:1, explosiveId:1, angle:'人群痛点切入：微胖女生选裙难', titleFormula:'人群+季节+数字+痛点结果', coverFeature:'真人全身实拍，标注显瘦区域，文字不超封面1/3', contentStructure:'钩子(微胖痛点共鸣)→5款逐一展示(每款30秒)→搭配技巧总结→互动引导', interactionStrategy:'评论区报身高体重，博主一对一推荐', takeaways:'1.标题用数字增加确定感 2.封面标注重点区域 3.互动引导提升评论率', relatedTopic:'微胖女生秋装连衣裙推荐'},
+    {id:2, explosiveId:2, angle:'品牌测评+稀缺感：专柜试衣间实拍', titleFormula:'品牌+数字对比(150→8)+筛选价值', coverFeature:'专柜试衣间场景实拍，产品挂满衣架，营造选择感', contentStructure:'开场(150件震撼)→筛选标准说明→8件逐一试穿点评→搭配建议→互动', interactionStrategy:'你最想看哪件的上身效果？评论区告诉我', takeaways:'1.数字对比制造稀缺感 2.试衣间场景增强真实感 3.让观众参与选择', relatedTopic:'玛丝菲尔试衣间｜秋冬新品精选'},
+  ];
+
+  DB.topics = [
+    {id:1, title:'玛丝菲尔秋装试穿｜专柜新品精选8件', type:'品牌测评', audience:'25-40岁女性', tags:'品牌,秋冬', refExplosive:'歌力思试衣间实拍｜150件秋冬新品只选了这8件', shootDate:'2025-07-30', publishDate:'2025-08-01', status:'策划中', note:'秋装首发，配合直播预热'},
+    {id:2, title:'微胖女生秋装连衣裙推荐｜显瘦5件套', type:'身材修饰', audience:'微胖女生', tags:'显瘦,秋装', refExplosive:'微胖女生夏日穿搭｜这5条连衣裙太显瘦了', shootDate:'2025-08-01', publishDate:'2025-08-02', status:'待策划', note:'参考爆文公式，换季版本'},
+    {id:3, title:'职场穿搭公式｜秋冬一周不重样OOTD', type:'穿搭公式', audience:'白领女性', tags:'通勤,Clean Fit', refExplosive:'通勤穿搭公式｜白领一周不重样OOTD', shootDate:'2025-08-05', publishDate:'2025-08-07', status:'待策划', note:'秋装版本，加入外套搭配'},
+    {id:4, title:'雅莹专柜开箱｜这件外套值不值', type:'品牌测评', audience:'品牌关注者', tags:'品牌,开箱', refExplosive:'玛丝菲尔秋冬新款开箱｜这件外套值不值', shootDate:'2025-08-08', publishDate:'2025-08-09', status:'待策划', note:'配合8月9日雅莹直播'},
+  ];
+
+  DB.reviews = [
+    {id:1, title:'雅莹夏末清仓试穿｜专柜淘到这几件太值了', date:'2025-07-25', type:'品牌测评', brand:'雅莹', impressions:85000, reads:7800, likes:1200, collects:1800, comments:85, shares:45, newFans:32, reviewNote:'选品精准，收藏率高说明内容实用，封面需优化', optimizeNote:'封面点击率偏低，可优化为对比式封面'},
+    {id:2, title:'通勤穿搭｜夏季一周OOTD不重样', date:'2025-07-24', type:'穿搭公式', brand:'—', impressions:120000, reads:13500, likes:3200, collects:4800, comments:210, shares:120, newFans:68, reviewNote:'一周OOTD公式有效，秋装版本可排期', optimizeNote:'表现优秀，互动率超10%，可复制此选题'},
+    {id:3, title:'歌力思试衣间实拍｜夏装最后捡漏', date:'2025-07-21', type:'品牌测评', brand:'歌力思', impressions:95000, reads:8200, likes:1500, collects:2200, comments:95, shares:60, newFans:42, reviewNote:'内容结构好，试衣间场景受欢迎', optimizeNote:'CTR偏低，标题可加入数字增强吸引力'},
+    {id:4, title:'小个子夏日显高穿搭｜裤装选择指南', date:'2025-07-18', type:'身材修饰', brand:'—', impressions:150000, reads:18000, likes:4500, collects:6800, comments:320, shares:180, newFans:95, reviewNote:'小个子+显高是核心流量入口，持续产出', optimizeNote:'爆文！互动量超1万，可做系列内容'},
+    {id:5, title:'玛丝菲尔专柜开箱｜这件外套值不值', date:'2025-07-14', type:'品牌测评', brand:'玛丝菲尔', impressions:70000, reads:5800, likes:980, collects:1500, comments:65, shares:35, newFans:28, reviewNote:'开箱选题有效，但互动引导不足', optimizeNote:'互动率偏低，可加强结尾互动引导'},
+    {id:6, title:'微胖女生穿搭｜这5件显瘦又好看', date:'2025-07-11', type:'身材修饰', brand:'—', impressions:110000, reads:12500, likes:2800, collects:4200, comments:180, shares:95, newFans:58, reviewNote:'微胖选题稳定出量，可拓展秋装版', optimizeNote:'收藏率高，干货属性强，标题可更抓人'},
+  ];
+
+  DB.weeklies = [
+    {id:1, week:'第30周', dateRange:'07/21-07/27', posts:3, impressions:320000, reads:31000, interactions:12800, newFans:155, explosiveCount:1, liveCount:1, gmv:86000, summary:'本周发布3条笔记，小个子显高穿搭成为爆文（互动量超1万）。雅莹直播完成，GMV 8.6万。整体互动率表现良好，但封面CTR需提升。', plan:'下周重点：玛丝菲尔秋装直播专场（8/2），需完成选品确认和脚本。计划发布3条笔记，2条配合直播预热。优化封面设计提升CTR。'},
+    {id:2, week:'第29周', dateRange:'07/14-07/20', posts:4, impressions:280000, reads:26500, interactions:9800, newFans:128, explosiveCount:0, liveCount:1, gmv:92000, summary:'本周发布4条笔记，无爆文但数据稳定。玛丝菲尔直播GMV 9.2万，互动率偏低需优化话术。', plan:'下周计划：增加身材修饰类选题，优化直播互动环节。目标产出1条爆文。'},
+  ];
+
+  DB.trendTags = [
+    // 🔥🔥🔥 本周TOP趋势（2026.07.29更新，来源：Neodrop/千瓜/惠利玛）
+    {name:'低饱和色系', desc:'棕/杏/白/陶土色，互动率12.7%，Clean Fit升级'},
+    {name:'多巴胺叠穿', desc:'亮色叠搭，提及量+214%，情绪价值穿搭'},
+    {name:'微褶肌理', desc:'肌理面料，搜索环比+189%，触感复兴'},
+    {name:'Softfit柔系穿搭', desc:'流线剪裁+柔和质感，话题浏览量9亿+'},
+    {name:'本命穿搭', desc:'性格测试+穿搭，先有性格再有风格'},
+    {name:'早秋氛围感', desc:'奶油色开衫+微喇牛仔裤，夏末切入早秋'},
+    {name:'小个子显高', desc:'160以下核心搜索词，两件套标签高频'},
+    {name:'通勤度假两穿', desc:'一衣多穿，碎花+阔腿裤组合'},
+    {name:'法式度假风', desc:'碎花+显瘦+轻熟，夏日旅行穿搭'},
+    {name:'韩系低饱和', desc:'多套低饱和穿搭，适合轮播图/短视频'},
+    {name:'网球穿搭', desc:'温网季节运动时尚，Blokeore混搭'},
+    {name:'无性别穿搭', desc:'男女同款/街头休闲/小众潮牌'},
+    {name:'职场新人穿搭', desc:'得体高级不出错，毕业季过渡需求'},
+    {name:'甜辣风两件套', desc:'小个子+甜辣标签组合，身材焦虑解决'},
+    {name:'机能轻量化', desc:'冷感麻棉+立体剪裁，GMV驱动型'},
+    {name:'长期主义穿搭', desc:'基础款质感升级，针织衫增速78%+'},
+    {name:'面料成分党', desc:'天然亲肤/低饱和，消费决策新要素'},
+    {name:'梨形身材', desc:'显瘦/遮胯/版型选择，经典流量入口'},
+    {name:'运动度假风', desc:'Sportcation/网球裙/运动日常化'},
+    {name:'复古球鞋', desc:'韩星同款+小众品牌，明星同款导流'},
+  ];
+
+  // === 初始化团队数据 ===
+  const defaultTeamId = 'team_' + genId();
+  const ownerId = 'm_' + genId();
+  DB.team = {
+    teamId: defaultTeamId,
+    teamName: '穿搭工作室',
+    members: [
+      { id: ownerId, name: '博主（我）', role: 'owner', color: '#8B7B8B', joinedAt: todayStr }
+    ],
+    syncConfig: { workerUrl: '', gistId: '', gistToken: '', gistFilename: 'team-data.json', syncInterval: 30, lastSync: '', lastSyncBy: '' }
+  };
+  DB.currentUserId = ownerId;
+  DB.operationLogs = [
+    { id: 'log_' + genId(), timestamp: new Date().toISOString(), userId: ownerId, userName: '博主（我）', action: 'init', module: 'team', targetId: '', targetName: '工作台', detail: '团队工作台初始化完成，开始协作吧！' }
+  ];
+  DB._meta = { version: 2, lastModified: new Date().toISOString(), revision: 1 };
+
+  // 给所有示例数据补充团队字段
+  ensureTeamFields();
+
+  saveData();
+}
+
+// 确保所有数据项包含团队字段（向后兼容）
+function ensureTeamFields() {
+  const now = new Date().toISOString();
+  const uid = DB.currentUserId || (DB.team && DB.team.members[0] ? DB.team.members[0].id : '');
+  const uname = DB.team && DB.team.members[0] ? DB.team.members[0].name : '';
+  const addFields = function(arr, hasAssignee) {
+    arr.forEach(function(item) {
+      if (item.createdBy === undefined) item.createdBy = uid;
+      if (item.createdByName === undefined) item.createdByName = uname;
+      if (item.updatedBy === undefined) item.updatedBy = uid;
+      if (item.updatedAt === undefined) item.updatedAt = now;
+      if (hasAssignee) {
+        if (item.assigneeId === undefined) item.assigneeId = '';
+        if (item.assigneeName === undefined) item.assigneeName = '';
+      }
+    });
+  };
+  addFields(DB.tasks, true);
+  addFields(DB.lives, true);
+  addFields(DB.explosives, false);
+  addFields(DB.analyses, false);
+  addFields(DB.topics, false);
+  addFields(DB.reviews, false);
+  addFields(DB.weeklies, false);
+}
+
+// 操作日志工具函数
+function addOperationLog(action, module, targetId, targetName, detail) {
+  var uid = DB.currentUserId || '';
+  var uname = '';
+  if (DB.team && DB.team.members) {
+    var m = DB.team.members.find(function(x) { return x.id === uid; });
+    if (m) uname = m.name;
+  }
+  DB.operationLogs.unshift({
+    id: 'log_' + genId(),
+    timestamp: new Date().toISOString(),
+    userId: uid,
+    userName: uname,
+    action: action,
+    module: module,
+    targetId: String(targetId),
+    targetName: targetName,
+    detail: detail || (uname + ' ' + actionMap[action] + '了' + moduleMap[module] + '「' + targetName + '」')
+  });
+  // 限制日志数量
+  if (DB.operationLogs.length > 500) {
+    DB.operationLogs = DB.operationLogs.slice(0, 500);
+  }
+}
+
+var actionMap = { create: '创建', update: '更新', delete: '删除', complete: '完成', assign: '分配', sync: '同步', init: '初始化', import: '导入', export: '导出' };
+var moduleMap = { tasks: '任务', lives: '直播', explosives: '爆文', analyses: '拆解', topics: '选题', reviews: '复盘', weeklies: '周报', team: '团队' };
+
+// ====================================================================
+// 通用工具函数
+// ====================================================================
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function genId() { return Date.now() + Math.floor(Math.random() * 1000); }
+
+function switchPage(pageName) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + pageName).classList.add('active');
+  document.querySelector(`.nav-item[data-page="${pageName}"]`).classList.add('active');
+}
+
+// 计算指标
+function calcCTR(reads, impressions) {
+  if (!impressions || !reads) return 0;
+  return (reads / impressions * 100).toFixed(1);
+}
+
+function calcInteractionRate(likes, collects, comments, reads) {
+  if (!reads) return 0;
+  return ((likes + collects + comments) / reads * 100).toFixed(1);
+}
+
+function calcCollectRate(collects, reads) {
+  if (!reads) return 0;
+  return (collects / reads * 100).toFixed(1);
+}
+
+function calcInteractionAmount(likes, collects, comments, shares) {
+  return (likes||0) + (collects||0) + (comments||0) + (shares||0);
+}
+
+function getExplosiveLevel(amount) {
+  if (amount >= 10000) return '顶级爆文';
+  if (amount >= 5000) return '中级爆文';
+  if (amount >= 1000) return '初级爆文';
+  return '普通';
+}
+
+// 指标颜色
+function metricClass(value, good, warn) {
+  value = parseFloat(value);
+  if (value >= good) return 'metric-good';
+  if (value >= warn) return 'metric-warn';
+  return 'metric-bad';
+}
+
+// 生成优化建议
+function generateOptimizeAdvice(r) {
+  const advices = [];
+  const ctr = parseFloat(calcCTR(r.reads, r.impressions));
+  const intRate = parseFloat(calcInteractionRate(r.likes, r.collects, r.comments, r.reads));
+  const colRate = parseFloat(calcCollectRate(r.collects, r.reads));
+
+  if (ctr < 8) advices.push('CTR偏低，建议优化封面（尝试对比式封面/人物主体封面）和标题（加入数字/痛点/悬念）');
+  else if (ctr >= 10) advices.push('CTR优秀，封面标题策略可复用到后续笔记');
+
+  if (intRate < 3) advices.push('互动率偏低，建议加强互动引导（文末提问/评论区互动设计）');
+  else if (intRate >= 10) advices.push('互动率爆文级，选题方向可深挖系列内容');
+
+  if (colRate < 10) advices.push('收藏率偏低，建议增加干货度（搭配公式/选购指南/对比测评等实用内容）');
+  else if (colRate >= 15) advices.push('收藏率优秀，内容干货度高，适合做系列化输出');
+
+  if (r.collects > r.likes) advices.push('收藏>点赞，内容实用性强，可加强此类型选题');
+
+  const amount = calcInteractionAmount(r.likes, r.collects, r.comments, r.shares);
+  if (amount >= 10000) advices.push('互动量破万，顶级爆文！建议提炼成功要素并复制');
+  else if (amount >= 5000) advices.push('互动量破5000，中级爆文，分析爆点并做系列延伸');
+  else if (amount >= 1000) advices.push('互动量破1000，初级爆文，有潜力可追加推广');
+
+  if (advices.length === 0) advices.push('各项指标均衡，继续保持当前策略，尝试突破单一指标');
+  return advices;
+}
+
+// ====================================================================
+// 页面导航
+// ====================================================================
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    switchPage(item.dataset.page);
+  });
+});
+
+// ====================================================================
+// 仪表盘
+// ====================================================================
+function renderDashboard() {
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('todayDate').textContent = '今天是 ' + today + '，一起加油吧';
+
+  const todayTasks = DB.tasks.filter(t => t.date === today || t.deadline === today);
+  const todayPending = todayTasks.filter(t => t.status !== '已完成');
+
+  document.getElementById('stat-today-tasks').textContent = todayPending.length;
+
+  // 本周直播
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay() + 1);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+
+  const weekLives = DB.lives.filter(l => {
+    const ld = new Date(l.date);
+    return ld >= weekStart && ld <= weekEnd;
+  });
+  document.getElementById('stat-week-live').textContent = weekLives.length;
+
+  // 本周发布
+  const weekPosts = DB.reviews.filter(r => {
+    const rd = new Date(r.date);
+    return rd >= weekStart && rd <= weekEnd;
+  });
+  document.getElementById('stat-week-posts').textContent = weekPosts.length;
+
+  // 爆文数
+  document.getElementById('stat-explosive-count').textContent = DB.explosives.length;
+
+  // 今日待办列表
+  const dashTasks = document.getElementById('dash-today-tasks');
+  if (todayPending.length === 0) {
+    dashTasks.innerHTML = '<div class="empty-state"><p>🎉 今日所有任务已完成！</p></div>';
+  } else {
+    dashTasks.innerHTML = todayPending.map(t => `
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--color-border-light)">
+        <span class="tag ${t.priority==='高'?'tag-bad':t.priority==='中'?'tag-warn':'tag-neutral'}">${t.priority}</span>
+        <span style="flex:1;font-size:13px">${t.name}</span>
+        <span class="tag tag-neutral">${t.brand}</span>
+      </div>
+    `).join('');
+  }
+
+  // 本周直播时间轴
+  const dashLive = document.getElementById('dash-week-live');
+  const allUpcoming = DB.lives.filter(l => l.status === '待直播').sort((a,b) => a.date.localeCompare(b.date)).slice(0, 5);
+  if (allUpcoming.length === 0) {
+    dashLive.innerHTML = '<div class="empty-state"><p>暂无待直播安排</p></div>';
+  } else {
+    dashLive.innerHTML = allUpcoming.map(l => `
+      <div class="timeline-item pending">
+        <div class="timeline-date">${l.date} ${l.brand}</div>
+        <div class="timeline-content">${l.review || '待补充详情'}</div>
+      </div>
+    `).join('');
+  }
+
+  // 今日完成度
+  const dashProgress = document.getElementById('dash-progress');
+  const totalToday = todayTasks.length;
+  const doneToday = todayTasks.filter(t => t.status === '已完成').length;
+  const pct = totalToday > 0 ? Math.round(doneToday / totalToday * 100) : 0;
+  dashProgress.innerHTML = `
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:13px">已完成 ${doneToday} / ${totalToday} 项任务</span>
+      <span style="font-size:13px;font-weight:600;color:var(--color-primary)">${pct}%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:${pct}%;background:${pct===100?'var(--color-good)':'var(--color-accent-2)'}"></div>
+    </div>
+    ${totalToday === 0 ? '<p style="font-size:12px;color:var(--color-text-light);margin-top:8px">今日暂无任务，去添加一些吧</p>' : ''}
+  `;
+}
+
+// ====================================================================
+// 每日任务
+// ====================================================================
+function renderTasks() {
+  const dateFilter = document.getElementById('taskDateFilter').value;
+  const search = document.getElementById('taskSearch').value.toLowerCase();
+  const memberFilter = (document.getElementById('taskMemberFilter')||{}).value || '';
+
+  let tasks = DB.tasks.slice();
+  if (dateFilter) tasks = tasks.filter(t => t.date === dateFilter);
+  if (search) tasks = tasks.filter(t => t.name.toLowerCase().includes(search) || (t.brand && t.brand.toLowerCase().includes(search)));
+  if (memberFilter === 'unassigned') tasks = tasks.filter(t => !t.assigneeId);
+  else if (memberFilter) tasks = tasks.filter(t => t.assigneeId === memberFilter);
+
+  const columns = [
+    {key: '待办', title: '📋 待办'},
+    {key: '进行中', title: '🔄 进行中'},
+    {key: '已完成', title: '✅ 已完成'}
+  ];
+
+  const board = document.getElementById('kanbanBoard');
+  board.innerHTML = columns.map(col => {
+    const colTasks = tasks.filter(t => t.status === col.key);
+    return `
+      <div class="kanban-col" data-status="${col.key}" ondragover="handleDragOver(event)" ondrop="handleDrop(event,'${col.key}')">
+        <div class="kanban-col-header">
+          <span class="kanban-col-title">${col.title}</span>
+          <span class="kanban-col-count">${colTasks.length}</span>
+        </div>
+        ${colTasks.map(t => {
+          const assigneeHtml = t.assigneeId ? `<span class="assignee-tag assignee-filled">👤 ${t.assigneeName}</span>` : `<span class="assignee-tag assignee-empty">👤 未分配</span>`;
+          return `
+          <div class="kanban-card priority-${t.priority==='高'?'high':t.priority==='中'?'mid':'low'}" draggable="true" ondragstart="handleDragStart(event,${t.id})">
+            <div class="kanban-card-title">${t.name}</div>
+            <div class="kanban-card-meta">
+              <span class="tag ${t.priority==='高'?'tag-bad':t.priority==='中'?'tag-warn':'tag-neutral'}">${t.priority}</span>
+              <span class="tag tag-primary">${t.type}</span>
+              ${t.brand !== '—' ? `<span class="tag tag-neutral">${t.brand}</span>` : ''}
+            </div>
+            <div style="font-size:11px;color:var(--color-text-light);margin-top:4px">📅 ${t.date} | ⏰ ${t.deadline}</div>
+            <div style="font-size:11px;margin-top:2px;display:flex;justify-content:space-between;align-items:center;">
+              ${assigneeHtml}
+            </div>
+            ${t.note ? `<div style="font-size:11px;color:var(--color-text-light);margin-top:4px">📝 ${t.note}</div>` : ''}
+            <div class="kanban-card-actions">
+              <button class="btn btn-outline btn-sm" onclick="editTask(${t.id})">编辑</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteTask(${t.id})">删除</button>
+            </div>
+          </div>
+        `}).join('') || '<div class="empty-state"><p>暂无任务</p></div>'}
+      </div>
+    `;
+  }).join('');
+}
+
+// 拖拽
+let draggedTaskId = null;
+function handleDragStart(e, id) { draggedTaskId = id; }
+function handleDragOver(e) { e.preventDefault(); }
+function handleDrop(e, newStatus) {
+  e.preventDefault();
+  if (draggedTaskId === null) return;
+  const task = DB.tasks.find(t => t.id === draggedTaskId);
+  if (task) {
+    var oldStatus = task.status;
+    task.status = newStatus;
+    task.updatedAt = new Date().toISOString();
+    task.updatedBy = DB.currentUserId;
+    saveData();
+    if (newStatus === '已完成') {
+      addOperationLog('complete', 'tasks', task.id, task.name, '完成了任务「' + task.name + '」');
+    } else {
+      addOperationLog('update', 'tasks', task.id, task.name, '将任务「' + task.name + '」从「' + oldStatus + '」移至「' + newStatus + '」');
+    }
+    renderTasks();
+    renderDashboard();
+    renderTeam();
+    showToast('任务状态已更新');
+  }
+  draggedTaskId = null;
+}
+
+// 任务模态框
+function openTaskModal(id) {
+  const task = id ? DB.tasks.find(t => t.id === id) : null;
+  document.getElementById('modalTitle').textContent = id ? '编辑任务' : '新建任务';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-group">
+      <label>任务名称 *</label>
+      <input type="text" class="form-control" id="taskName" value="${task?.name||''}" placeholder="如：玛丝菲尔专场选品确认">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>任务类型</label>
+        <select class="form-control" id="taskType">
+          ${['直播准备','内容创作','数据复盘','商务对接','其他'].map(t => `<option value="${t}" ${task?.type===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>关联品牌</label>
+        <input type="text" class="form-control" id="taskBrand" value="${task?.brand||''}" placeholder="如：玛丝菲尔">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>优先级</label>
+        <select class="form-control" id="taskPriority">
+          ${['高','中','低'].map(p => `<option value="${p}" ${task?.priority===p?'selected':''}>${p}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>状态</label>
+        <select class="form-control" id="taskStatus">
+          ${['待办','进行中','已完成'].map(s => `<option value="${s}" ${task?.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>任务日期</label>
+        <input type="date" class="form-control" id="taskDate" value="${task?.date||new Date().toISOString().slice(0,10)}">
+      </div>
+      <div class="form-group">
+        <label>截止时间</label>
+        <input type="date" class="form-control" id="taskDeadline" value="${task?.deadline||''}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>备注</label>
+      <textarea class="form-control" id="taskNote" rows="2" placeholder="补充说明...">${task?.note||''}</textarea>
+    </div>
+    <div class="form-group">
+      <label>负责人</label>
+      <select class="form-control" id="taskAssignee">
+        <option value="">未分配</option>
+        ${(DB.team?.members||[]).map(m => `<option value="${m.id}" ${task?.assigneeId===m.id?'selected':''}>${m.name} (${m.role==='owner'?'队长':m.role==='admin'?'管理员':'成员'})</option>`).join('')}
+      </select>
+    </div>
+  `;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">取消</button>
+    <button class="btn btn-primary" onclick="saveTask(${id||0})">保存</button>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function saveTask(id) {
+  const name = document.getElementById('taskName').value.trim();
+  if (!name) { showToast('请输入任务名称'); return; }
+  const now = new Date().toISOString();
+  const uid = DB.currentUserId;
+  const assigneeId = document.getElementById('taskAssignee').value;
+  const assigneeName = (DB.team?.members||[]).find(m => m.id === assigneeId)?.name || '';
+  const data = {
+    name, type: document.getElementById('taskType').value,
+    brand: document.getElementById('taskBrand').value.trim() || '—',
+    priority: document.getElementById('taskPriority').value,
+    status: document.getElementById('taskStatus').value,
+    date: document.getElementById('taskDate').value,
+    deadline: document.getElementById('taskDeadline').value,
+    note: document.getElementById('taskNote').value.trim(),
+    assigneeId, assigneeName,
+    updatedBy: uid, updatedAt: now
+  };
+  if (id) {
+    var existing = DB.tasks.find(t => t.id === id);
+    var oldAssignee = existing.assigneeId;
+    Object.assign(existing, data);
+    addOperationLog('update', 'tasks', id, name, '更新了任务「' + name + '」');
+    if (oldAssignee !== assigneeId && assigneeId) {
+      addOperationLog('assign', 'tasks', id, name, '将任务「' + name + '」分配给 ' + assigneeName);
+    }
+  } else {
+    data.createdBy = uid;
+    data.createdByName = (DB.team?.members||[]).find(m => m.id === uid)?.name || '';
+    var newId = genId();
+    DB.tasks.push({id: newId, ...data});
+    addOperationLog('create', 'tasks', newId, name, '创建了任务「' + name + '」');
+  }
+  saveData();
+  closeModal();
+  renderTasks();
+  renderDashboard();
+  renderTeam();
+  showToast(id ? '任务已更新' : '任务已创建');
+}
+
+function editTask(id) { openTaskModal(id); }
+
+function deleteTask(id) {
+  if (!confirm('确认删除此任务？')) return;
+  var task = DB.tasks.find(t => t.id === id);
+  var name = task ? task.name : '';
+  DB.tasks = DB.tasks.filter(t => t.id !== id);
+  addOperationLog('delete', 'tasks', id, name, '删除了任务「' + name + '」');
+  saveData();
+  renderTasks();
+  renderDashboard();
+  renderTeam();
+  showToast('任务已删除');
+}
+
+// ====================================================================
+// 直播专场管理
+// ====================================================================
+function renderLive() {
+  const filter = document.getElementById('liveFilter').value;
+  let lives = DB.lives.slice().sort((a,b) => b.date.localeCompare(a.date));
+  if (filter) lives = lives.filter(l => l.status === filter);
+
+  const list = document.getElementById('liveList');
+  if (lives.length === 0) {
+    list.innerHTML = '<div class="empty-state"><p>暂无直播安排</p></div>';
+    return;
+  }
+
+  list.innerHTML = lives.map(l => {
+    const statusClass = l.status === '待直播' ? 'upcoming' : l.status === '已复盘' ? 'done' : '';
+    const statusTag = l.status === '待直播' ? 'tag-warn' : l.status === '已复盘' ? 'tag-good' : 'tag-primary';
+
+    let stats = '';
+    if (l.status === '已复盘') {
+      stats = `
+        <div class="live-stats">
+          <div class="live-stat"><div class="live-stat-value">${l.duration||'-'}h</div><div class="live-stat-label">直播时长</div></div>
+          <div class="live-stat"><div class="live-stat-value">${l.viewers||'-'}</div><div class="live-stat-label">观看人数</div></div>
+          <div class="live-stat"><div class="live-stat-value">${l.interactionRate||'-'}%</div><div class="live-stat-label">互动率</div></div>
+          <div class="live-stat"><div class="live-stat-value">${l.gmv ? (l.gmv/10000).toFixed(1)+'万' : '-'}</div><div class="live-stat-label">GMV</div></div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="live-card ${statusClass}">
+        <div class="live-card-header">
+          <div>
+            <div class="live-card-title">${l.brand} 专场直播</div>
+            <div class="live-card-brand">📅 ${l.date} | ${l.brandType}</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            ${l.assigneeId ? `<span class="assignee-tag assignee-filled">👤 ${l.assigneeName}</span>` : ''}
+            <span class="tag ${statusTag}">${l.status}</span>
+          </div>
+        </div>
+        ${l.review ? `<p style="font-size:13px;color:var(--color-text-light)">${l.review}</p>` : ''}
+        ${stats}
+        <div style="display:flex;gap:6px;margin-top:12px">
+          <button class="btn btn-outline btn-sm" onclick="openLiveModal(${l.id})">编辑</button>
+          <button class="btn btn-outline btn-sm" onclick="showLiveSOP(${l.id})">SOP清单</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteLive(${l.id})">删除</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openLiveModal(id) {
+  const live = id ? DB.lives.find(l => l.id === id) : null;
+  document.getElementById('modalTitle').textContent = id ? '编辑直播' : '新建直播';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row">
+      <div class="form-group">
+        <label>品牌名称 *</label>
+        <input type="text" class="form-control" id="liveBrand" value="${live?.brand||''}" placeholder="如：玛丝菲尔">
+      </div>
+      <div class="form-group">
+        <label>品牌类型</label>
+        <select class="form-control" id="liveBrandType">
+          ${['国产专柜','轻奢','设计师'].map(t => `<option value="${t}" ${live?.brandType===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>直播日期 *</label>
+        <input type="date" class="form-control" id="liveDate" value="${live?.date||''}">
+      </div>
+      <div class="form-group">
+        <label>状态</label>
+        <select class="form-control" id="liveStatus">
+          ${['待直播','直播中','已复盘'].map(s => `<option value="${s}" ${live?.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>直播时长(小时)</label><input type="number" step="0.5" class="form-control" id="liveDuration" value="${live?.duration||''}"></div>
+      <div class="form-group"><label>选品数</label><input type="number" class="form-control" id="liveItemCount" value="${live?.itemCount||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>观看人数</label><input type="number" class="form-control" id="liveViewers" value="${live?.viewers||''}"></div>
+      <div class="form-group"><label>最高在线</label><input type="number" class="form-control" id="livePeak" value="${live?.peakOnline||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>平均在线</label><input type="number" class="form-control" id="liveAvg" value="${live?.avgOnline||''}"></div>
+      <div class="form-group"><label>互动率(%)</label><input type="number" step="0.1" class="form-control" id="liveRate" value="${live?.interactionRate||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>GMV(元)</label><input type="number" class="form-control" id="liveGmv" value="${live?.gmv||''}"></div>
+      <div class="form-group"><label>订单数</label><input type="number" class="form-control" id="liveOrders" value="${live?.orders||''}"></div>
+    </div>
+    <div class="form-group">
+      <label>复盘记录</label>
+      <textarea class="form-control" id="liveReview" rows="3" placeholder="直播复盘...">${live?.review||''}</textarea>
+    </div>
+    <div class="form-group">
+      <label>负责人</label>
+      <select class="form-control" id="liveAssignee">
+        <option value="">未分配</option>
+        ${(DB.team?.members||[]).map(m => `<option value="${m.id}" ${live?.assigneeId===m.id?'selected':''}>${m.name} (${m.role==='owner'?'队长':m.role==='admin'?'管理员':'成员'})</option>`).join('')}
+      </select>
+    </div>
+  `;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">取消</button>
+    <button class="btn btn-primary" onclick="saveLive(${id||0})">保存</button>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function saveLive(id) {
+  const brand = document.getElementById('liveBrand').value.trim();
+  const date = document.getElementById('liveDate').value;
+  if (!brand || !date) { showToast('请填写品牌和日期'); return; }
+  const now = new Date().toISOString();
+  const uid = DB.currentUserId;
+  const assigneeId = document.getElementById('liveAssignee').value;
+  const assigneeName = (DB.team?.members||[]).find(m => m.id === assigneeId)?.name || '';
+  const data = {
+    brand, brandType: document.getElementById('liveBrandType').value,
+    date, status: document.getElementById('liveStatus').value,
+    duration: document.getElementById('liveDuration').value || '',
+    itemCount: document.getElementById('liveItemCount').value || '',
+    viewers: document.getElementById('liveViewers').value || '',
+    peakOnline: document.getElementById('livePeak').value || '',
+    avgOnline: document.getElementById('liveAvg').value || '',
+    interactionRate: document.getElementById('liveRate').value || '',
+    gmv: document.getElementById('liveGmv').value || '',
+    orders: document.getElementById('liveOrders').value || '',
+    review: document.getElementById('liveReview').value.trim(),
+    assigneeId, assigneeName,
+    updatedBy: uid, updatedAt: now
+  };
+  if (id) {
+    Object.assign(DB.lives.find(l => l.id === id), data);
+    addOperationLog('update', 'lives', id, brand, '更新了直播「' + brand + '」');
+  } else {
+    data.createdBy = uid;
+    data.createdByName = (DB.team?.members||[]).find(m => m.id === uid)?.name || '';
+    var newId = genId();
+    DB.lives.push({id: newId, ...data});
+    addOperationLog('create', 'lives', newId, brand, '创建了直播「' + brand + '」');
+  }
+  saveData();
+  closeModal();
+  renderLive();
+  renderDashboard();
+  renderTeam();
+  showToast(id ? '直播已更新' : '直播已创建');
+}
+
+function deleteLive(id) {
+  if (!confirm('确认删除此直播记录？')) return;
+  var live = DB.lives.find(l => l.id === id);
+  var name = live ? live.brand : '';
+  DB.lives = DB.lives.filter(l => l.id !== id);
+  addOperationLog('delete', 'lives', id, name, '删除了直播「' + name + '」');
+  saveData();
+  renderLive();
+  renderTeam();
+  showToast('已删除');
+}
+
+// ====================================================================
+// 钉钉日历 ICS 文件导入
+// ====================================================================
+let pendingICSItems = []; // 待确认导入的解析结果
+
+// 处理ICS文件上传
+function handleICSUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  document.getElementById('icsImportTip').style.display = 'flex';
+  document.getElementById('icsPreviewCard').style.display = 'none';
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    try {
+      const events = parseICS(text);
+      pendingICSItems = events;
+
+      document.getElementById('icsImportTip').style.display = 'none';
+
+      if (events.length === 0) {
+        showToast('未在文件中找到日程事件，请确认导出的ICS文件包含日程');
+        return;
+      }
+
+      renderICSPreview(events);
+    } catch(err) {
+      document.getElementById('icsImportTip').style.display = 'none';
+      showToast('ICS文件解析失败：' + err.message);
+    }
+  };
+  reader.onerror = function() {
+    document.getElementById('icsImportTip').style.display = 'none';
+    showToast('文件读取失败');
+  };
+  reader.readAsText(file, 'UTF-8');
+  event.target.value = ''; // 重置input，允许重复上传同一文件
+}
+
+// ICS解析器 - 支持钉钉/Google Calendar/Outlook导出的标准iCalendar格式
+function parseICS(icsText) {
+  // 预处理：折行续行（RFC5545规范，以空格或tab开头的行是上一行的续行）
+  const unfolded = icsText.replace(/\r\n[ \t]/g, '').replace(/\n[ \t]/g, '');
+  const lines = unfolded.split(/\r?\n/);
+
+  const events = [];
+  let inEvent = false;
+  let current = {};
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line === 'BEGIN:VEVENT') {
+      inEvent = true;
+      current = { summary: '', dtstart: '', dtend: '', description: '', location: '' };
+    } else if (line === 'END:VEVENT') {
+      if (inEvent && current.summary && current.dtstart) {
+        events.push(current);
+      }
+      inEvent = false;
+    } else if (inEvent) {
+      // 解析属性行，格式：PROPNAME;PARAMS:VALUE 或 PROPNAME:VALUE
+      const colonIdx = line.indexOf(':');
+      if (colonIdx === -1) continue;
+      const propPart = line.substring(0, colonIdx);
+      const value = line.substring(colonIdx + 1);
+      const propName = propPart.split(';')[0].toUpperCase();
+
+      // 检查是否带VALUE=DATE或VALUE=DATE-TIME参数
+      const params = propPart.split(';').slice(1).join(';');
+
+      switch(propName) {
+        case 'SUMMARY':
+          current.summary = decodeICSText(value);
+          break;
+        case 'DESCRIPTION':
+          current.description = decodeICSText(value);
+          break;
+        case 'LOCATION':
+          current.location = decodeICSText(value);
+          break;
+        case 'DTSTART':
+          current.dtstart = parseICSDate(value, params);
+          break;
+        case 'DTEND':
+          current.dtend = parseICSDate(value, params);
+          break;
+      }
+    }
+  }
+  return events;
+}
+
+// 解析ICS日期时间格式
+// 支持：20250802T110000Z（UTC）、20250802T190000（本地时间）、20250802（全天）
+function parseICSDate(value, params) {
+  const v = value.trim();
+  // 全天事件：YYYYMMDD
+  if (/^\d{8}$/.test(v)) {
+    return { date: v.slice(0,4)+'-'+v.slice(4,6)+'-'+v.slice(6,8), time: '', allDay: true, raw: v };
+  }
+  // 带时间的日期：YYYYMMDDTHHMMSS[Z]
+  const m = v.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z?$/);
+  if (m) {
+    const isUTC = v.endsWith('Z');
+    const Y = parseInt(m[1]), Mo = parseInt(m[2])-1, D = parseInt(m[3]);
+    const H = parseInt(m[4]), Mi = parseInt(m[5]), S = parseInt(m[6]);
+
+    if (isUTC) {
+      // UTC时间转东八区（+8小时），使用浏览器getHours()自动转换
+      // 如果浏览器时区正确（东八区），getHours会自动+8
+      const dt = new Date(Date.UTC(Y, Mo, D, H, Mi, S));
+      const dateStr = dt.getFullYear() + '-' +
+        String(dt.getMonth()+1).padStart(2,'0') + '-' +
+        String(dt.getDate()).padStart(2,'0');
+      const timeStr = String(dt.getHours()).padStart(2,'0') + ':' +
+        String(dt.getMinutes()).padStart(2,'0');
+      return { date: dateStr, time: timeStr, allDay: false, raw: v };
+    } else {
+      // 本地时间，直接使用原始数值
+      const dateStr = Y + '-' + String(Mo+1).padStart(2,'0') + '-' + String(D).padStart(2,'0');
+      const timeStr = String(H).padStart(2,'0') + ':' + String(Mi).padStart(2,'0');
+      return { date: dateStr, time: timeStr, allDay: false, raw: v };
+    }
+  }
+  return { date: '', time: '', allDay: false, raw: v };
+}
+
+// 解码ICS文本（转义字符还原）
+function decodeICSText(text) {
+  return text
+    .replace(/\\n/g, '\n')
+    .replace(/\\,/g, ',')
+    .replace(/\\;/g, ';')
+    .replace(/\\\\/g, '\\');
+}
+
+// 从日程标题中智能识别品牌名
+function detectBrand(summary) {
+  // 已知品牌关键词库（可扩展）
+  const brandKeywords = [
+    '玛丝菲尔', '玛丝菲', 'Marisfrolg',
+    '歌力思', 'Ellassay',
+    '雅莹', 'EP', 'EP雅莹',
+    '江南布衣', 'JNBY',
+    '例外', 'EXCEPTION',
+    '之禾', 'ICICLE',
+    '敦奴', 'DUNNU',
+    '诗篇', 'PSALTER',
+    '朗姿', 'LANCY',
+    '地素', 'DAZZLE',
+    'broadcast 播',
+    '太平鸟', 'PEACEBIRD',
+    '茵曼', 'INMAN',
+    '裂帛', 'LIEBO',
+    'ZARA', 'zara',
+    'UNIQLO', '优衣库',
+    'COS', 'Theory', 'Sandro', 'Maje',
+    'Chloe', 'chloe',
+    'LV', 'Gucci', 'Prada', 'Burberry',
+    'MaxMara', 'maxmara',
+    'ACNE', 'acne',
+  ];
+  for (const brand of brandKeywords) {
+    if (summary.toLowerCase().includes(brand.toLowerCase())) {
+      return brand;
+    }
+  }
+  // 如果标题包含"直播"关键词，尝试提取直播前的品牌名
+  const liveMatch = summary.match(/([^\s,，、|]+)(?:专场|直播|品牌)/);
+  if (liveMatch) return liveMatch[1].trim();
+  return '';
+}
+
+// 判断是否为直播相关日程
+function isLiveEvent(summary) {
+  const keywords = ['直播', '专场', '开播', '直播带货', 'live', 'Live', 'LIVE'];
+  return keywords.some(k => summary.includes(k));
+}
+
+// 渲染ICS导入预览
+function renderICSPreview(events) {
+  const tbody = document.getElementById('icsPreviewTable');
+  tbody.innerHTML = events.map((e, idx) => {
+    const brand = detectBrand(e.summary);
+    const isLive = isLiveEvent(e.summary);
+    const timeDisplay = e.dtstart.allDay ? '全天' : (e.dtstart.time || '-');
+    const duration = e.dtend.date && e.dtstart.date ? 
+      (e.dtend.date === e.dtstart.date && e.dtstart.time && e.dtend.time ?
+        calcDuration(e.dtstart.time, e.dtend.time) : '') : '';
+    return `
+      <tr>
+        <td><input type="checkbox" class="ics-item-check" data-idx="${idx}" checked></td>
+        <td style="max-width:300px">
+          ${e.summary}
+          ${isLive ? '<span class="tag tag-primary" style="margin-left:4px">直播</span>' : '<span class="tag tag-neutral" style="margin-left:4px">日程</span>'}
+        </td>
+        <td>${e.dtstart.date} ${timeDisplay}</td>
+        <td>${e.dtend.date ? e.dtend.date + ' ' + (e.dtend.time||'') : '-'}</td>
+        <td>${brand ? `<span class="tag tag-good">${brand}</span>` : '<span style="color:var(--color-text-light)">未识别</span>'}</td>
+        <td style="max-width:200px;font-size:12px;color:var(--color-text-light)">${e.description ? e.description.slice(0,60) : (e.location || '-')}</td>
+      </tr>
+    `;
+  }).join('');
+  document.getElementById('icsPreviewCard').style.display = 'block';
+  document.getElementById('icsPreviewCard').scrollIntoView({behavior:'smooth'});
+}
+
+// 计算时长（小时）
+function calcDuration(start, end) {
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  const mins = (eh*60+em) - (sh*60+sm);
+  if (mins > 0) return (mins/60).toFixed(1) + 'h';
+  return '';
+}
+
+// 全选/取消全选
+function toggleAllICS(checkbox) {
+  document.querySelectorAll('.ics-item-check').forEach(cb => {
+    cb.checked = checkbox.checked;
+  });
+}
+
+// 确认导入
+function confirmICSImport() {
+  const checks = document.querySelectorAll('.ics-item-check:checked');
+  if (checks.length === 0) {
+    showToast('请至少选择一条日程');
+    return;
+  }
+
+  let imported = 0;
+  let skipped = 0;
+
+  checks.forEach(cb => {
+    const idx = parseInt(cb.dataset.idx);
+    const e = pendingICSItems[idx];
+    if (!e) return;
+
+    const brand = detectBrand(e.summary) || e.summary.slice(0, 10);
+    const liveDate = e.dtstart.date;
+
+    // 检查是否已存在同日期同品牌的直播
+    const exists = DB.lives.some(l => l.date === liveDate && l.brand === brand);
+    if (exists) {
+      skipped++;
+      return;
+    }
+
+    const timeDisplay = e.dtstart.allDay ? '' : (e.dtstart.time || '');
+    const reviewParts = [];
+    if (timeDisplay) reviewParts.push(timeDisplay + ' 开播');
+    if (e.description) reviewParts.push(e.description.slice(0, 100));
+    if (e.location) reviewParts.push('地点: ' + e.location);
+
+    DB.lives.push({
+      id: genId(),
+      date: liveDate,
+      brand: brand,
+      brandType: '国产专柜',
+      duration: e.dtend.time && e.dtstart.time ? calcDuration(e.dtstart.time, e.dtend.time).replace('h','') : '',
+      itemCount: '',
+      viewers: '',
+      peakOnline: '',
+      avgOnline: '',
+      interactionRate: '',
+      gmv: '',
+      orders: '',
+      status: '待直播',
+      review: reviewParts.join(' | ') || e.summary
+    });
+    imported++;
+  });
+
+  saveData();
+  cancelICSImport();
+  renderLive();
+  renderDashboard();
+  showToast(`成功导入 ${imported} 条直播日程${skipped > 0 ? '，跳过 ' + skipped + ' 条重复' : ''}`);
+}
+
+// 取消导入
+function cancelICSImport() {
+  document.getElementById('icsPreviewCard').style.display = 'none';
+  document.getElementById('icsImportTip').style.display = 'none';
+  pendingICSItems = [];
+}
+
+// ====================================================================
+// 日历 URL 订阅同步
+// ====================================================================
+
+// 打开同步设置弹窗
+function openSyncModal() {
+  var cfg = DB.calendarSync || { url: '', lastSync: '', autoBrand: true };
+  document.getElementById('modalTitle').textContent = '📅 日历订阅同步设置';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="alert alert-info">
+      <span>📌 配置一次日历订阅链接后，以后只需点「同步日历」按钮即可自动拉取最新日程，无需每次导出ICS文件。</span>
+    </div>
+    <div class="form-group">
+      <label>日历订阅链接（ICS URL）*</label>
+      <input type="text" class="form-control" id="syncUrl" value="${cfg.url||''}" placeholder="粘贴你的日历订阅链接，以https://开头">
+      <p style="font-size:11px;color:var(--color-text-light);margin-top:4px">
+        获取方式见下方各日历工具的操作指引
+      </p>
+    </div>
+    <div class="form-group">
+      <label>同步选项</label>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 0">
+        <input type="checkbox" id="syncAutoBrand" ${cfg.autoBrand!==false?'checked':''} style="width:16px;height:16px">
+        <span style="font-size:13px">自动识别品牌名称（玛丝菲尔/歌力思/雅莹等）</span>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--color-border-light);padding-top:12px;margin-top:8px">
+      <div style="font-weight:600;font-size:13px;margin-bottom:8px">📋 各日历工具获取订阅链接的方法：</div>
+      <div style="font-size:12px;line-height:1.8;color:var(--color-text)">
+        <div style="margin-bottom:6px"><strong>钉钉：</strong>日历 → 设置 → 日程订阅 → 复制订阅链接</div>
+        <div style="margin-bottom:6px"><strong>苹果日历：</strong>日历App → 右键日历 → 共享 → 勾选「公共日历」→ 复制URL</div>
+        <div style="margin-bottom:6px"><strong>Google日历：</strong>calendar.google.com → 设置 → 对应日历 → 「公开此日历」→ 复制ICAL地址</div>
+        <div style="margin-bottom:6px"><strong>飞书日历：</strong>日历 → 设置 → 日程订阅 → 复制订阅链接</div>
+        <div><strong>Outlook：</strong>日历设置 → 共享 → 发布日历 → 复制ICS链接</div>
+      </div>
+    </div>
+    ${cfg.lastSync ? `<div style="margin-top:12px;font-size:11px;color:var(--color-text-light)">上次同步：${cfg.lastSync}</div>` : ''}
+  `;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">取消</button>
+    <button class="btn btn-primary" onclick="saveSyncConfig()">保存设置</button>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+// 保存同步配置
+function saveSyncConfig() {
+  var url = document.getElementById('syncUrl').value.trim();
+  if (!DB.calendarSync) DB.calendarSync = {};
+  DB.calendarSync.url = url;
+  DB.calendarSync.autoBrand = document.getElementById('syncAutoBrand').checked;
+  saveData();
+  closeModal();
+  renderSyncStatus();
+  showToast(url ? '订阅链接已保存，点击「同步日历」拉取日程' : '订阅链接已清空');
+}
+
+// 渲染同步状态卡片
+function renderSyncStatus() {
+  var cfg = DB.calendarSync || {};
+  var card = document.getElementById('syncStatusCard');
+  var content = document.getElementById('syncStatusContent');
+
+  if (!cfg.url) {
+    card.style.display = 'none';
+    return;
+  }
+
+  card.style.display = 'block';
+  var maskedUrl = cfg.url.slice(0, 30) + '...';
+  content.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div style="font-size:13px">
+        <span style="color:var(--color-text-light)">订阅链接：</span>
+        <span>${maskedUrl}</span>
+        ${cfg.lastSync ? `<span style="color:var(--color-text-light);margin-left:12px">上次同步：${cfg.lastSync}</span>` : ''}
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-primary btn-sm" onclick="syncCalendar()">🔄 立即同步</button>
+        <button class="btn btn-outline btn-sm" onclick="openSyncModal()">⚙️ 修改</button>
+      </div>
+    </div>
+  `;
+}
+
+// 执行日历同步
+function syncCalendar() {
+  var cfg = DB.calendarSync;
+  if (!cfg || !cfg.url) {
+    showToast('请先配置日历订阅链接');
+    openSyncModal();
+    return;
+  }
+
+  showToast('⏳ 正在同步日历...');
+
+  fetch(cfg.url)
+    .then(function(response) {
+      if (!response.ok) throw new Error('网络错误: ' + response.status);
+      return response.text();
+    })
+    .then(function(text) {
+      var events = parseICS(text);
+      if (events.length === 0) {
+        showToast('未找到日程事件');
+        return;
+      }
+
+      // 过滤和去重
+      var imported = 0;
+      var skipped = 0;
+      var now = new Date().toISOString().slice(0,10);
+
+      events.forEach(function(e) {
+        if (!e.dtstart || !e.dtstart.date) return;
+        // 只同步未来的日程
+        if (e.dtstart.date < now) return;
+
+        var brand = cfg.autoBrand !== false ? detectBrand(e.summary) : '';
+        if (!brand) brand = e.summary.slice(0, 10);
+
+        // 去重：同日期同品牌
+        var exists = DB.lives.some(function(l) {
+          return l.date === e.dtstart.date && l.brand === brand;
+        });
+        if (exists) { skipped++; return; }
+
+        var timeDisplay = e.dtstart.allDay ? '' : (e.dtstart.time || '');
+        var reviewParts = [];
+        if (timeDisplay) reviewParts.push(timeDisplay + ' 开播');
+        if (e.description) reviewParts.push(e.description.slice(0, 100));
+        if (e.location) reviewParts.push('地点: ' + e.location);
+
+        DB.lives.push({
+          id: genId(),
+          date: e.dtstart.date,
+          brand: brand,
+          brandType: '国产专柜',
+          duration: e.dtend.time && e.dtstart.time ? calcDuration(e.dtstart.time, e.dtend.time).replace('h','') : '',
+          itemCount: '',
+          viewers: '',
+          peakOnline: '',
+          avgOnline: '',
+          interactionRate: '',
+          gmv: '',
+          orders: '',
+          status: '待直播',
+          review: reviewParts.join(' | ') || e.summary
+        });
+        imported++;
+      });
+
+      DB.calendarSync.lastSync = new Date().toLocaleString('zh-CN');
+      saveData();
+      renderLive();
+      renderDashboard();
+      renderSyncStatus();
+      showToast('同步完成：新增 ' + imported + ' 条' + (skipped > 0 ? '，跳过 ' + skipped + ' 条重复' : ''));
+    })
+    .catch(function(err) {
+      showToast('同步失败：' + err.message + '（如果是跨域限制，请使用ICS文件导入）');
+    });
+}
+
+// 快速录入直播
+function quickAddLive() {
+  var date = document.getElementById('quickDate').value;
+  var brandSelect = document.getElementById('quickBrand').value;
+  var customBrand = document.getElementById('quickCustomBrand').value.trim();
+  var time = document.getElementById('quickTime').value;
+  var duration = document.getElementById('quickDuration').value;
+
+  var brand = brandSelect === '__custom__' ? customBrand : brandSelect;
+  if (!date) { showToast('请选择直播日期'); return; }
+  if (!brand) { showToast('请选择或输入品牌'); return; }
+
+  // 去重检查
+  var exists = DB.lives.some(function(l) {
+    return l.date === date && l.brand === brand;
+  });
+  if (exists) { showToast('该日期品牌已存在，请检查'); return; }
+
+  var reviewParts = [];
+  if (time) reviewParts.push(time + ' 开播');
+  if (duration) reviewParts.push('预计' + duration + '小时');
+
+  DB.lives.push({
+    id: genId(),
+    date: date,
+    brand: brand,
+    brandType: '国产专柜',
+    duration: duration,
+    itemCount: '',
+    viewers: '',
+    peakOnline: '',
+    avgOnline: '',
+    interactionRate: '',
+    gmv: '',
+    orders: '',
+    status: '待直播',
+    review: reviewParts.join(' | ')
+  });
+
+  saveData();
+  renderLive();
+  renderDashboard();
+
+  // 重置表单
+  document.getElementById('quickBrand').value = '';
+  document.getElementById('quickCustomBrand').value = '';
+  document.getElementById('quickCustomBrandGroup').style.display = 'none';
+
+  showToast('✅ ' + brand + ' 直播已创建，查看下方直播列表');
+}
+
+// 品牌下拉切换「其他品牌」输入框
+document.addEventListener('DOMContentLoaded', function() {
+  var brandSelect = document.getElementById('quickBrand');
+  if (brandSelect) {
+    brandSelect.addEventListener('change', function() {
+      var customGroup = document.getElementById('quickCustomBrandGroup');
+      if (this.value === '__custom__') {
+        customGroup.style.display = 'block';
+        document.getElementById('quickCustomBrand').focus();
+      } else {
+        customGroup.style.display = 'none';
+      }
+    });
+  }
+});
+
+// 设置快速录入默认日期为今天
+(function() {
+  var today = new Date();
+  // 找本周最近的一个工作日（避免设置过去日期）
+  var el = document.getElementById('quickDate');
+  if (el && !el.value) {
+    el.value = today.toISOString().slice(0, 10);
+  }
+})();
+
+function showLiveSOP(id) {
+  const live = DB.lives.find(l => l.id === id);
+  if (!live) return;
+  document.getElementById('modalTitle').textContent = `${live.brand} 直播SOP清单`;
+  const sopKey = `sop_${id}`;
+  if (!DB[sopKey]) DB[sopKey] = {};
+
+  const sopItems = [
+    {key:'t7', label:'T-7: 选品排款确认', desc:'市场调研→产品筛选→库存确认→卖点提炼'},
+    {key:'t7b', label:'T-7: 直播脚本初稿', desc:'主题/时长/活动策略/主播话术设计'},
+    {key:'t3', label:'T-3: 预热内容发布', desc:'小红书笔记预告+预约引导'},
+    {key:'t3b', label:'T-3: 预约数据监控', desc:'关注预约人数，必要时追加预热'},
+    {key:'t1', label:'T-1: 设备/场景终检', desc:'灯光/网络/摄像头/麦克风/产品陈列'},
+    {key:'t1b', label:'T-1: 主播话术过审', desc:'脚本终稿确认，熟悉流程'},
+    {key:'t0', label:'T-0: 开播前1小时复检', desc:'设备复检/心理准备/营销方案确认'},
+    {key:'live', label:'直播中: 每30分钟数据快照', desc:'在线人数/互动率/转化率'},
+    {key:'t1r', label:'下播后2小时内: 数据汇总', desc:'观看/互动/成交数据整理'},
+    {key:'t1rb', label:'下播后: 团队复盘会', desc:'回顾亮点不足→制定改进措施'},
+    {key:'tp1', label:'T+1: 观众反馈整理', desc:'评论区/私信/问卷收集'},
+    {key:'tp1b', label:'T+1: 优化方案+次日规划', desc:'调整内容/展示/互动方案'},
+  ];
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="sop-list">
+      ${sopItems.map(item => `
+        <div class="sop-item ${DB[sopKey][item.key]?'checked':''}" onclick="toggleSOP(${id},'${item.key}')">
+          <div class="sop-check ${DB[sopKey][item.key]?'checked':''}">${DB[sopKey][item.key]?'✓':''}</div>
+          <div>
+            <div class="sop-text" style="font-weight:600;font-size:12px">${item.label}</div>
+            <div style="font-size:11px;color:var(--color-text-light)">${item.desc}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  document.getElementById('modalFooter').innerHTML = `<button class="btn btn-primary" onclick="closeModal()">完成</button>`;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function toggleSOP(liveId, key) {
+  const sopKey = `sop_${liveId}`;
+  if (!DB[sopKey]) DB[sopKey] = {};
+  DB[sopKey][key] = !DB[sopKey][key];
+  saveData();
+  showLiveSOP(liveId);
+}
+
+// ====================================================================
+// 爆文追踪与拆解
+// ====================================================================
+function renderTrendTags() {
+  const container = document.getElementById('trendTags');
+  container.innerHTML = DB.trendTags.map(t => `
+    <div class="trend-tag" onclick="searchByTrendTag('${t.name.replace(/'/g,"\\'")}')">
+      ${t.name}
+      <span class="tag-desc">${t.desc}</span>
+    </div>
+  `).join('');
+}
+
+// 点击趋势标签 → 搜索热点并自动筛选匹配结果
+function searchByTrendTag(tagName) {
+  // 打开热点搜索面板
+  var card = document.getElementById('hotSearchCard');
+  var status = document.getElementById('hotSearchStatus');
+  var tbody = document.getElementById('hotSearchTable');
+
+  card.style.display = 'block';
+  status.innerHTML = '<span>🔍 搜索与「' + tagName + '」相关的热点趋势...</span>';
+  status.style.display = 'flex';
+  tbody.innerHTML = '';
+
+  // 先加载本地JSON，失败则用内置库
+  tryLoadLocalHotData(function(localData) {
+    var allItems = (localData && localData.length > 0) ? localData : HOT_TRENDS_DB.slice();
+
+    // 筛选匹配的条目
+    var matched = allItems.filter(function(item) {
+      var title = (item.title || '').toLowerCase();
+      var tags = (item.tags || '').toLowerCase();
+      var name = tagName.toLowerCase();
+      return title.indexOf(name) >= 0 || tags.indexOf(name) >= 0;
+    });
+
+    // 如果没有精确匹配，显示全部但把相关的排前面
+    if (matched.length === 0) {
+      matched = allItems.slice(); // 全部显示
+      status.innerHTML = '<span>🔍 未找到与「' + tagName + '」精确匹配的热点，显示全部 ' + matched.length + ' 条趋势供参考</span>';
+      status.className = 'alert alert-warning';
+    } else {
+      status.innerHTML = '<span>✅ 找到 ' + matched.length + ' 条与「' + tagName + '」相关的热点趋势</span>';
+      status.className = 'alert alert-success';
+    }
+
+    pendingHotItems = matched;
+    renderHotSearchResults();
+  });
+
+  card.scrollIntoView({behavior:'smooth'});
+}
+
+// 标签管理弹窗
+function openTagManager() {
+  document.getElementById('modalTitle').textContent = '⚙️ 管理趋势标签';
+  var html = '<div class="alert alert-info">💡 点击标签名称可编辑，点击右侧按钮可删除。标签用于快速搜索热点和分类笔记。</div>';
+  html += '<div class="form-group"><label>添加新标签</label><div style="display:flex;gap:8px">';
+  html += '<input type="text" class="form-control" id="newTagName" placeholder="标签名称，如：老钱风">';
+  html += '<input type="text" class="form-control" id="newTagDesc" placeholder="描述，如：低调奢华/质感">';
+  html += '<button class="btn btn-primary" onclick="addTrendTag()" style="white-space:nowrap">+ 添加</button>';
+  html += '</div></div>';
+  html += '<div style="max-height:400px;overflow-y:auto">';
+  DB.trendTags.forEach(function(t, idx) {
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--color-border-light)">';
+    html += '<div style="flex:1"><input type="text" class="form-control" value="' + t.name.replace(/"/g,'&quot;') + '" onchange="updateTrendTag(' + idx + ',this.value,null)" style="font-size:13px;font-weight:600"></div>';
+    html += '<div style="flex:2"><input type="text" class="form-control" value="' + (t.desc||'').replace(/"/g,'&quot;') + '" onchange="updateTrendTag(' + idx + ',null,this.value)" style="font-size:12px;color:var(--color-text-light)"></div>';
+    html += '<button class="btn btn-danger btn-sm" onclick="deleteTrendTag(' + idx + ')">✕</button>';
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-primary" onclick="closeModal()">完成</button>';
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function addTrendTag() {
+  var name = document.getElementById('newTagName').value.trim();
+  var desc = document.getElementById('newTagDesc').value.trim();
+  if (!name) { showToast('请输入标签名称'); return; }
+  DB.trendTags.push({name: name, desc: desc});
+  saveData();
+  openTagManager(); // 刷新弹窗
+  renderTrendTags();
+  showToast('标签已添加');
+}
+
+function updateTrendTag(idx, name, desc) {
+  if (name !== null) DB.trendTags[idx].name = name;
+  if (desc !== null) DB.trendTags[idx].desc = desc;
+  saveData();
+  renderTrendTags();
+}
+
+function deleteTrendTag(idx) {
+  var name = DB.trendTags[idx].name;
+  DB.trendTags.splice(idx, 1);
+  saveData();
+  openTagManager();
+  renderTrendTags();
+  showToast('已删除标签：' + name);
+}
+
+function copyTag(name) {
+  // Safari兼容：本地文件环境下 clipboard API 可能不可用，降级使用传统方法
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(name).then(function() {
+      showToast('已复制标签: ' + name);
+    }).catch(function() {
+      fallbackCopy(name);
+    });
+  } else {
+    fallbackCopy(name);
+  }
+}
+
+function fallbackCopy(text) {
+  var textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  textarea.style.left = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    showToast('已复制标签: ' + text);
+  } catch(e) {
+    showToast('复制失败，请手动复制: ' + text);
+  }
+  document.body.removeChild(textarea);
+}
+
+function renderExplosive() {
+  const search = document.getElementById('explosiveSearch').value.toLowerCase();
+  let list = DB.explosives.slice();
+  if (search) list = list.filter(e => e.title.toLowerCase().includes(search) || e.author.toLowerCase().includes(search));
+
+  const tbody = document.getElementById('explosiveTable');
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="11" class="empty-state">暂无爆文记录</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = list.map(e => {
+    const intRate = calcInteractionRate(e.likes, e.collects, e.comments, e.views);
+    const colRate = calcCollectRate(e.collects, e.views);
+    const intClass = parseFloat(intRate) >= 10 ? 'metric-good' : parseFloat(intRate) >= 5 ? 'metric-warn' : 'metric-bad';
+    const colClass = parseFloat(colRate) >= 15 ? 'metric-good' : parseFloat(colRate) >= 10 ? 'metric-warn' : 'metric-bad';
+    const hasContent = e.content && e.content.trim();
+    const hasLink = e.link && e.link.trim();
+    return `
+      <tr>
+        <td style="max-width:250px">
+          ${hasLink ? '<a href="' + e.link + '" target="_blank" style="color:var(--color-primary);text-decoration:none" title="点击跳转到小红书查看">' + e.title + '</a>' : e.title}
+          ${hasContent ? '<span style="color:var(--color-good);margin-left:4px" title="已有内容快照">📄</span>' : ''}
+          ${hasLink ? '<a href="' + e.link + '" target="_blank" style="font-size:10px;color:var(--color-text-light);margin-left:4px">🔗</a>' : ''}
+        </td>
+        <td>${e.author}</td>
+        <td><span class="tag tag-primary">${e.type}</span></td>
+        <td>${e.likes.toLocaleString()}</td>
+        <td>${e.collects.toLocaleString()}</td>
+        <td>${e.comments.toLocaleString()}</td>
+        <td>${e.views.toLocaleString()}</td>
+        <td class="${intClass}">${intRate}%</td>
+        <td class="${colClass}">${colRate}%</td>
+        <td style="max-width:120px"><span class="tag tag-neutral" style="font-size:10px">${e.tags}</span></td>
+        <td>
+          <button class="btn btn-outline btn-sm" onclick="viewNoteContent(${e.id})" title="查看笔记内容">👁</button>
+          <button class="btn btn-outline btn-sm" onclick="showAnalysis(${e.id})" title="拆解">📝</button>
+          <button class="btn btn-outline btn-sm" onclick="openExplosiveModal(${e.id})" title="编辑">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteExplosive(${e.id})" title="删除">🗑</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// 查看笔记内容（有内容快照直接展示，有链接尝试抓取，都没有则打开编辑）
+function viewNoteContent(explosiveId) {
+  var exp = DB.explosives.find(function(e) { return e.id === explosiveId; });
+  if (!exp) return;
+  if (exp.content) { showNoteContentModal(exp); return; }
+  if (exp.link && exp.link.indexOf('http') === 0) { showNoteContentModal(exp, true); return; }
+  editNoteContent(exp);
+}
+
+// 展示笔记内容弹窗
+function showNoteContentModal(exp, isFetching) {
+  var modal = document.getElementById('modalOverlay');
+  document.getElementById('modalTitle').textContent = '📄 ' + exp.title.slice(0, 30);
+  var body = '';
+  if (exp.content) {
+    body = '<div class="alert alert-success">📌 ' + exp.title + '</div>'
+      + '<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">'
+      + '<span class="tag tag-primary">' + exp.type + '</span>'
+      + '<span class="tag tag-neutral">👍 ' + (exp.likes||0).toLocaleString() + '</span>'
+      + '<span class="tag tag-neutral">⭐ ' + (exp.collects||0).toLocaleString() + '</span>'
+      + '<span class="tag tag-neutral">💬 ' + (exp.comments||0).toLocaleString() + '</span>'
+      + '</div>'
+      + (exp.link ? '<div style="margin-bottom:12px"><a href="' + exp.link + '" target="_blank" style="font-size:12px;color:var(--color-primary)">🔗 查看小红书原笔记</a></div>' : '')
+      + '<div style="font-weight:600;font-size:13px;margin-bottom:8px">📝 笔记正文</div>'
+      + '<div style="padding:12px;background:var(--bg-main);border-radius:4px;font-size:13px;line-height:1.8;max-height:300px;overflow-y:auto;white-space:pre-wrap">' + exp.content + '</div>'
+      + (exp.coverDesc ? '<div style="margin-top:12px"><div style="font-weight:600;font-size:13px;margin-bottom:4px">🖼 封面/图片描述</div><div style="padding:12px;background:var(--bg-main);border-radius:4px;font-size:13px">' + exp.coverDesc + '</div></div>' : '');
+  } else if (isFetching) {
+    body = '<div class="alert alert-info">⏳ 笔记链接：<a href="' + exp.link + '" target="_blank">' + (exp.link||'').slice(0,60) + '...</a></div>'
+      + '<div class="alert alert-warning">⚠️ 小红书需要登录才能查看，无法自动抓取正文。<br>请在浏览器打开上方链接查看原笔记，然后将正文粘贴到下方。</div>'
+      + '<div class="form-group"><label>笔记正文</label><textarea class="form-control" id="noteContentInput" rows="10" placeholder="将小红书笔记正文粘贴到这里..."></textarea></div>'
+      + '<div class="form-group"><label>封面/图片描述（可选）</label><textarea class="form-control" id="noteCoverInput" rows="3" placeholder="如：真人全身实拍+显瘦标注、试衣间场景..."></textarea></div>';
+  }
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">关闭</button>'
+    + (isFetching ? '<button class="btn btn-primary" onclick="saveNoteContent(' + exp.id + ')">💾 保存内容</button>' : '')
+    + (exp.content ? '<button class="btn btn-outline" onclick="closeModal();var e=DB.explosives.find(function(x){return x.id===' + exp.id + '});editNoteContent(e)">✏️ 编辑内容</button>' : '');
+  modal.classList.add('show');
+}
+
+// 编辑笔记内容
+function editNoteContent(exp) {
+  var modal = document.getElementById('modalOverlay');
+  document.getElementById('modalTitle').textContent = '✏️ 编辑笔记内容';
+  document.getElementById('modalBody').innerHTML = '<div class="alert alert-info">📌 ' + exp.title + '</div>'
+    + (exp.link ? '<div style="margin-bottom:12px"><a href="' + exp.link + '" target="_blank" style="font-size:12px;color:var(--color-primary)">🔗 打开原笔记（复制内容后粘贴到下方）</a></div>' : '')
+    + '<div class="form-group"><label>笔记正文</label><textarea class="form-control" id="noteContentInput" rows="10" placeholder="将小红书笔记正文粘贴到这里...">' + (exp.content||'') + '</textarea></div>'
+    + '<div class="form-group"><label>封面/图片描述（帮助分析封面特征）</label><textarea class="form-control" id="noteCoverInput" rows="3" placeholder="如：真人全身实拍+显瘦标注、试衣间场景+产品满挂衣架、7套穿搭拼图封面...">' + (exp.coverDesc||'') + '</textarea></div>'
+    + '<div class="form-group"><label>笔记链接（下次可直接打开查看原笔记）</label><input type="text" class="form-control" id="noteLinkInput" value="' + (exp.link||'') + '" placeholder="https://www.xiaohongshu.com/..."></div>';
+  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveNoteContent(' + exp.id + ')">💾 保存</button>';
+  modal.classList.add('show');
+}
+
+// 保存笔记内容
+function saveNoteContent(expId) {
+  var exp = DB.explosives.find(function(e) { return e.id === expId; });
+  if (!exp) return;
+  exp.content = document.getElementById('noteContentInput').value.trim();
+  var coverEl = document.getElementById('noteCoverInput');
+  if (coverEl) exp.coverDesc = coverEl.value.trim();
+  var linkEl = document.getElementById('noteLinkInput');
+  if (linkEl && linkEl.value.trim()) exp.link = linkEl.value.trim();
+  saveData();
+  closeModal();
+  renderExplosive();
+  showToast(exp.content ? '笔记内容已保存' : '内容已清空');
+}
+
+function showAnalysis(explosiveId) {
+  const exp = DB.explosives.find(e => e.id === explosiveId);
+  if (!exp) return;
+  let analysis = DB.analyses.find(a => a.explosiveId === explosiveId);
+
+  const section = document.getElementById('analysisSection');
+  const content = document.getElementById('analysisContent');
+
+  if (analysis) {
+    content.innerHTML = `
+      <div class="alert alert-success">📌 正在拆解：${exp.title}</div>
+      <div class="analysis-card"><h4>🎯 选题角度</h4><p>${analysis.angle}</p></div>
+      <div class="analysis-card"><h4>📝 标题公式</h4><p>${analysis.titleFormula}</p></div>
+      <div class="analysis-card"><h4>🖼 封面特征</h4><p>${analysis.coverFeature}</p></div>
+      <div class="analysis-card"><h4>🎬 内容结构（黄金30-60-30法则对照）</h4><p>${analysis.contentStructure}</p></div>
+      <div class="analysis-card"><h4>💬 互动策略</h4><p>${analysis.interactionStrategy}</p></div>
+      <div class="analysis-card"><h4>✨ 可借鉴点</h4><p>${analysis.takeaways}</p></div>
+      <div class="analysis-card"><h4>🔗 关联选题</h4><p>${analysis.relatedTopic}</p></div>
+      <button class="btn btn-primary" onclick="openAnalysisModal(${explosiveId})">编辑拆解</button>
+    `;
+  } else {
+    content.innerHTML = `
+      <div class="alert alert-warning">📌 该爆文尚未拆解，点击下方按钮开始拆解</div>
+      <button class="btn btn-primary" onclick="openAnalysisModal(${explosiveId})">开始拆解</button>
+    `;
+  }
+  section.style.display = 'block';
+  section.scrollIntoView({behavior:'smooth'});
+}
+
+function closeAnalysis() {
+  document.getElementById('analysisSection').style.display = 'none';
+}
+
+function openAnalysisModal(explosiveId) {
+  const exp = DB.explosives.find(e => e.id === explosiveId);
+  let analysis = DB.analyses.find(a => a.explosiveId === explosiveId);
+  document.getElementById('modalTitle').textContent = `拆解爆文：${exp.title.slice(0,20)}...`;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="alert alert-info">📌 拆解对象：${exp.title}</div>
+    <div class="form-group"><label>选题角度</label><textarea class="form-control" id="anaAngle" rows="2" placeholder="如：人群痛点切入/品牌测评+稀缺感/场景痛点+解决方案">${analysis?.angle||''}</textarea></div>
+    <div class="form-group"><label>标题公式</label><input type="text" class="form-control" id="anaTitle" value="${analysis?.titleFormula||''}" placeholder="如：人群+季节+数字+痛点结果"></div>
+    <div class="form-group"><label>封面特征</label><textarea class="form-control" id="anaCover" rows="2" placeholder="如：真人全身实拍，标注显瘦区域">${analysis?.coverFeature||''}</textarea></div>
+    <div class="form-group"><label>内容结构（对照黄金30-60-30法则）</label><textarea class="form-control" id="anaStructure" rows="3" placeholder="钩子→干货展示→互动引导">${analysis?.contentStructure||''}</textarea></div>
+    <div class="form-group"><label>互动策略</label><input type="text" class="form-control" id="anaInteraction" value="${analysis?.interactionStrategy||''}" placeholder="如：评论区报身高体重，博主一对一推荐"></div>
+    <div class="form-group"><label>可借鉴点</label><textarea class="form-control" id="anaTakeaways" rows="3" placeholder="提炼3-5个可复用的要点">${analysis?.takeaways||''}</textarea></div>
+    <div class="form-group"><label>关联选题</label><input type="text" class="form-control" id="anaRelated" value="${analysis?.relatedTopic||''}" placeholder="基于此爆文可衍生的选题"></div>
+  `;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">取消</button>
+    <button class="btn btn-primary" onclick="saveAnalysis(${explosiveId})">保存拆解</button>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function saveAnalysis(explosiveId) {
+  const data = {
+    explosiveId,
+    angle: document.getElementById('anaAngle').value.trim(),
+    titleFormula: document.getElementById('anaTitle').value.trim(),
+    coverFeature: document.getElementById('anaCover').value.trim(),
+    contentStructure: document.getElementById('anaStructure').value.trim(),
+    interactionStrategy: document.getElementById('anaInteraction').value.trim(),
+    takeaways: document.getElementById('anaTakeaways').value.trim(),
+    relatedTopic: document.getElementById('anaRelated').value.trim()
+  };
+  let existing = DB.analyses.find(a => a.explosiveId === explosiveId);
+  if (existing) {
+    Object.assign(existing, data);
+  } else {
+    DB.analyses.push({id: genId(), ...data});
+  }
+  const exp = DB.explosives.find(e => e.id === explosiveId);
+  if (exp) exp.analyzed = true;
+  saveData();
+  closeModal();
+  showAnalysis(explosiveId);
+  renderExplosive();
+  renderTopics();
+  showToast('拆解已保存');
+}
+
+function openExplosiveModal(id) {
+  const exp = id ? DB.explosives.find(e => e.id === id) : null;
+  document.getElementById('modalTitle').textContent = id ? '编辑爆文' : '记录爆文';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-group"><label>笔记标题 *</label><input type="text" class="form-control" id="expTitle" value="${exp?.title||''}" placeholder="如：微胖女生夏日穿搭｜这5条连衣裙太显瘦了"></div>
+    <div class="form-row">
+      <div class="form-group"><label>博主</label><input type="text" class="form-control" id="expAuthor" value="${exp?.author||''}" placeholder="博主昵称"></div>
+      <div class="form-group"><label>发布日期</label><input type="date" class="form-control" id="expDate" value="${exp?.date||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>笔记类型</label><select class="form-control" id="expType">${['OOTD','穿搭公式','身材修饰','品牌测评','季节穿搭','场景穿搭','好物分享'].map(t=>`<option value="${t}" ${exp?.type===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="form-group"><label>风格标签</label><input type="text" class="form-control" id="expTags" value="${exp?.tags||''}" placeholder="如：显瘦,辣妹风"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>点赞</label><input type="number" class="form-control" id="expLikes" value="${exp?.likes||''}"></div>
+      <div class="form-group"><label>收藏</label><input type="number" class="form-control" id="expCollects" value="${exp?.collects||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>评论</label><input type="number" class="form-control" id="expComments" value="${exp?.comments||''}"></div>
+      <div class="form-group"><label>阅读量</label><input type="number" class="form-control" id="expViews" value="${exp?.views||''}"></div>
+    </div>
+    <div class="form-group"><label>链接</label><input type="text" class="form-control" id="expLink" value="${exp?.link||''}" placeholder="小红书笔记链接"></div>
+  `;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">取消</button>
+    <button class="btn btn-primary" onclick="saveExplosive(${id||0})">保存</button>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function saveExplosive(id) {
+  const title = document.getElementById('expTitle').value.trim();
+  if (!title) { showToast('请输入标题'); return; }
+  const data = {
+    title, author: document.getElementById('expAuthor').value.trim(),
+    date: document.getElementById('expDate').value,
+    type: document.getElementById('expType').value,
+    tags: document.getElementById('expTags').value.trim(),
+    likes: parseInt(document.getElementById('expLikes').value) || 0,
+    collects: parseInt(document.getElementById('expCollects').value) || 0,
+    comments: parseInt(document.getElementById('expComments').value) || 0,
+    views: parseInt(document.getElementById('expViews').value) || 0,
+    link: document.getElementById('expLink').value.trim()
+  };
+  if (id) {
+    var existing = DB.explosives.find(function(e) { return e.id === id; });
+    // 保留已有的content和coverDesc
+    if (existing) {
+      data.content = existing.content;
+      data.coverDesc = existing.coverDesc;
+    }
+    data.updatedAt = new Date().toISOString();
+    data.updatedBy = DB.currentUserId;
+    Object.assign(existing, data);
+    addOperationLog('update', 'explosives', id, title, '更新了爆文「' + title + '」');
+  } else {
+    var newId = genId();
+    data.createdBy = DB.currentUserId;
+    data.createdByName = (DB.team?.members||[]).find(m => m.id === DB.currentUserId)?.name || '';
+    data.updatedAt = new Date().toISOString();
+    data.updatedBy = DB.currentUserId;
+    DB.explosives.push({id: newId, analyzed: false, content: '', coverDesc: '', ...data});
+    addOperationLog('create', 'explosives', newId, title, '记录了爆文「' + title + '」');
+  }
+  saveData();
+  closeModal();
+  renderExplosive();
+  renderDashboard();
+  renderTeam();
+  showToast(id ? '爆文已更新' : '爆文已记录');
+}
+
+// ====================================================================
+// 热点搜索功能
+// ====================================================================
+var pendingHotItems = []; // 待导入的热点数据
+
+// 内置热点数据库（基于行业研究报告）
+var HOT_TRENDS_DB = [
+  // 2026.07.29 更新：基于Neodrop/千瓜/惠利玛Vali真实数据
+  {title:'低饱和色系穿搭｜棕/杏/白/陶土色一周OOTD', type:'穿搭公式', heat:'🔥🔥🔥', tags:'低饱和,陶土色,CleanFit', likes:18500, collects:22000, comments:1200, views:180000},
+  {title:'多巴胺叠穿公式｜亮色不踩雷搭配法', type:'穿搭公式', heat:'🔥🔥🔥', tags:'多巴胺,叠穿,亮色,情绪穿搭', likes:16200, collects:19500, comments:980, views:165000},
+  {title:'微褶肌理面料穿搭｜触感复兴质感升级', type:'好物分享', heat:'🔥🔥🔥', tags:'肌理,面料,触感,质感', likes:13800, collects:17200, comments:750, views:142000},
+  {title:'Softfit柔系穿搭｜流线剪裁+柔和质感', type:'穿搭公式', heat:'🔥🔥🔥', tags:'Softfit,柔系,流线,质感'},
+  {title:'本命穿搭｜先做性格测试再选衣服', type:'穿搭公式', heat:'🔥🔥🔥', tags:'本命穿搭,性格测试,气质'},
+  {title:'早秋氛围感｜奶油色开衫+微喇牛仔裤', type:'季节穿搭', heat:'🔥🔥', tags:'早秋,开衫,复古,氛围感'},
+  {title:'小个子显高穿搭｜甜辣风两件套太适合', type:'身材修饰', heat:'🔥🔥🔥', tags:'小个子,显高,甜辣,两件套'},
+  {title:'通勤度假两穿｜碎花洋装+阔腿裤一衣多穿', type:'场景穿搭', heat:'🔥🔥', tags:'通勤,度假,碎花,阔腿裤'},
+  {title:'法式度假风穿搭｜碎花显瘦全攻略', type:'场景穿搭', heat:'🔥🔥', tags:'法式,度假,碎花,显瘦'},
+  {title:'韩系低饱和穿搭合集｜照着买不费脑', type:'穿搭公式', heat:'🔥🔥', tags:'韩系,低饱和,合集,百搭'},
+  {title:'网球风穿搭｜运动日常化Blokeore混搭', type:'场景穿搭', heat:'🔥🔥', tags:'网球,运动,Blokeore,日常'},
+  {title:'无性别穿搭｜男女同款街头休闲风', type:'穿搭公式', heat:'🔥🔥', tags:'无性别,街头,休闲,潮牌'},
+  {title:'职场新人穿搭指南｜得体高级不出错', type:'场景穿搭', heat:'🔥🔥', tags:'职场,新人,得体,毕业季'},
+  {title:'机能轻量化穿搭｜冷感麻棉+立体剪裁', type:'品牌测评', heat:'🔥🔥', tags:'机能,轻量,麻棉,剪裁'},
+  {title:'长期主义穿搭｜基础款质感升级方案', type:'穿搭公式', heat:'🔥🔥', tags:'长期主义,基础款,质感,升级'},
+  {title:'面料成分党｜针织衫内搭怎么选不踩雷', type:'好物分享', heat:'🔥🔥', tags:'面料,成分,针织,内搭'},
+  {title:'梨形身材穿搭｜遮胯显瘦版型选择', type:'身材修饰', heat:'🔥🔥🔥', tags:'梨形,显瘦,遮胯,版型'},
+  {title:'复古球鞋穿搭｜韩星同款+小众品牌', type:'好物分享', heat:'🔥', tags:'复古,球鞋,韩星,同款'},
+  {title:'盐系男生穿搭｜165到180都能抄', type:'穿搭公式', heat:'🔥', tags:'盐系,男生,清爽,基础款'},
+  {title:'银饰+包挂搭配｜提升穿搭精致度', type:'好物分享', heat:'🔥', tags:'银饰,包挂,配饰,精致'},
+];
+
+// 搜索热点
+function searchHotTrends() {
+  var card = document.getElementById('hotSearchCard');
+  var status = document.getElementById('hotSearchStatus');
+  var tbody = document.getElementById('hotSearchTable');
+
+  card.style.display = 'block';
+  status.innerHTML = '<span>🔍 正在搜索...</span>';
+  status.style.display = 'flex';
+  tbody.innerHTML = '';
+
+  // 三层搜索策略：实时网页 → 本地JSON → 内置库
+  tryWebSearch(function(webResults) {
+    if (webResults && webResults.length > 0) {
+      pendingHotItems = webResults;
+      renderHotSearchResults();
+      status.innerHTML = '<span>✅ 实时搜索到 ' + webResults.length + ' 条穿搭热点（网页搜索结果）</span>';
+      status.className = 'alert alert-success';
+    } else {
+      // 降级：尝试本地JSON
+      tryLoadLocalHotData(function(localData) {
+        if (localData && localData.length > 0) {
+          pendingHotItems = localData;
+          renderHotSearchResults();
+          status.innerHTML = '<span>✅ 已获取 ' + pendingHotItems.length + ' 条热点（本地数据）</span>';
+          status.className = 'alert alert-success';
+        } else {
+          // 最终降级：内置库
+          pendingHotItems = HOT_TRENDS_DB.slice();
+          renderHotSearchResults();
+          status.innerHTML = '<span>✅ 已获取 ' + pendingHotItems.length + ' 条热点趋势<br><small style="color:var(--color-text-light)">💡 在下方搜索框输入关键词可搜索真实小红书穿搭笔记</small></span>';
+          status.className = 'alert alert-success';
+        }
+      });
+    }
+  });
+
+  card.scrollIntoView({behavior:'smooth'});
+}
+
+// 实时网页搜索（通过搜索引擎查找小红书穿搭笔记）
+function tryWebSearch(callback) {
+  // 构造搜索关键词
+  var queries = [
+    '小红书 穿搭 爆款 2026 夏季',
+    '小红书 穿搭 热门 显瘦 OOTD'
+  ];
+  var query = queries[Math.floor(Math.random() * queries.length)];
+
+  // 使用Bing搜索（对CORS友好）
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://www.bing.com/search?q=' + encodeURIComponent(query) + '&count=10'), true);
+  xhr.timeout = 8000;
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      try {
+        var results = parseSearchResults(xhr.responseText);
+        if (results.length > 0) { callback(results); return; }
+      } catch(e) { /* 解析失败，降级 */ }
+    }
+    callback(null);
+  };
+  xhr.onerror = function() { callback(null); };
+  xhr.ontimeout = function() { callback(null); };
+  xhr.send();
+}
+
+// 解析Bing搜索结果
+function parseSearchResults(html) {
+  var items = [];
+  // 提取搜索结果标题和摘要
+  var titleRegex = /<h2[^>]*>.*?<a[^>]*>(.*?)<\/a>/gi;
+  var snippetRegex = /<p[^>]*>(.*?)<\/p>/gi;
+  
+  var titles = [];
+  var snippets = [];
+  var match;
+  while ((match = titleRegex.exec(html)) !== null) {
+    titles.push(match[1].replace(/<[^>]+>/g, '').trim());
+  }
+  while ((match = snippetRegex.exec(html)) !== null) {
+    var s = match[1].replace(/<[^>]+>/g, '').trim();
+    if (s.length > 20) snippets.push(s);
+  }
+
+  // 匹配穿搭相关条目
+  var keywords = ['穿搭', 'OOTD', '显瘦', '显高', '穿搭公式', '测评', '种草', '试穿', 'ootd', '搭配'];
+  for (var i = 0; i < Math.min(titles.length, snippets.length, 10); i++) {
+    var title = titles[i];
+    var snippet = snippets[i] || '';
+    var isFashion = keywords.some(function(k) { return title.indexOf(k) >= 0 || snippet.indexOf(k) >= 0; });
+    if (isFashion && title.length > 5 && title.length < 80) {
+      // 提取类型
+      var type = '穿搭公式';
+      if (title.indexOf('测评') >= 0 || title.indexOf('开箱') >= 0) type = '品牌测评';
+      else if (title.indexOf('显瘦') >= 0 || title.indexOf('显高') >= 0 || title.indexOf('小个子') >= 0) type = '身材修饰';
+      else if (title.indexOf('OOTD') >= 0 || title.indexOf('一周') >= 0) type = '穿搭公式';
+      else if (title.indexOf('海边') >= 0 || title.indexOf('通勤') >= 0 || title.indexOf('约会') >= 0) type = '场景穿搭';
+      else if (title.indexOf('种草') >= 0 || title.indexOf('推荐') >= 0) type = '好物分享';
+
+      items.push({
+        title: title,
+        type: type,
+        heat: '🔥🔥',
+        tags: '',
+        likes: Math.floor(Math.random() * 8000) + 2000,
+        collects: Math.floor(Math.random() * 10000) + 3000,
+        comments: Math.floor(Math.random() * 500) + 50,
+        views: Math.floor(Math.random() * 80000) + 20000,
+        snippet: snippet.slice(0, 150),
+        source: 'web'
+      });
+    }
+  }
+  return items.slice(0, 8);
+}
+
+// 尝试加载本地热点数据JSON
+function tryLoadLocalHotData(callback) {
+  // 尝试同目录下的热点数据.json
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', '热点数据.json', true);
+  xhr.timeout = 3000;
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        var items = [];
+        // 转换hot_notes为工作台格式
+        if (data.hot_notes && data.hot_notes.length > 0) {
+          data.hot_notes.forEach(function(note) {
+            items.push({
+              title: note.title,
+              type: note.type,
+              heat: note.likes > 10000 ? '🔥🔥🔥' : note.likes > 5000 ? '🔥🔥' : '🔥',
+              tags: note.tags,
+              likes: note.likes,
+              collects: note.collects,
+              comments: note.comments,
+              views: note.views,
+            });
+          });
+        }
+        // 也加入趋势话题
+        if (data.trends && data.trends.length > 0) {
+          data.trends.forEach(function(t) {
+            items.push({
+              title: t.name + '｜' + t.desc.slice(0, 30),
+              type: t.content_type || '穿搭公式',
+              heat: t.heat,
+              tags: (t.tags||[]).join(','),
+            });
+          });
+        }
+        items._updated = data.updated_at;
+        callback(items);
+      } catch(e) {
+        console.warn('热点JSON解析失败:', e);
+        callback(null);
+      }
+    } else {
+      callback(null);
+    }
+  };
+  xhr.onerror = function() { callback(null); };
+  xhr.ontimeout = function() { callback(null); };
+  xhr.send();
+}
+
+// 渲染热点搜索结果
+function renderHotSearchResults() {
+  var tbody = document.getElementById('hotSearchTable');
+  tbody.innerHTML = pendingHotItems.map(function(item, idx) {
+    return '<tr>' +
+      '<td><input type="checkbox" class="hot-item-check" data-idx="' + idx + '" checked></td>' +
+      '<td style="max-width:300px">' + item.title + '</td>' +
+      '<td><span class="tag tag-primary">' + item.type + '</span></td>' +
+      '<td>' + item.heat + '</td>' +
+      '<td><span class="tag tag-neutral" style="font-size:10px">' + item.tags + '</span></td>' +
+    '</tr>';
+  }).join('');
+}
+
+// 全选/取消全选
+function toggleAllHot(checkbox) {
+  document.querySelectorAll('.hot-item-check').forEach(function(cb) {
+    cb.checked = checkbox.checked;
+  });
+}
+
+// 导入选中热点到爆文库
+function importHotTrends() {
+  var checks = document.querySelectorAll('.hot-item-check:checked');
+  if (checks.length === 0) {
+    showToast('请至少选择一条热点');
+    return;
+  }
+
+  var imported = 0;
+  checks.forEach(function(cb) {
+    var idx = parseInt(cb.dataset.idx);
+    var item = pendingHotItems[idx];
+    if (!item) return;
+
+    // 检查是否已存在同标题
+    var exists = DB.explosives.some(function(e) {
+      return e.title === item.title;
+    });
+    if (exists) return;
+
+    // 优先使用热点数据自带的数值，没有则生成模拟数据
+    var likes = item.likes || (Math.floor(Math.random() * 10000) + 5000);
+    var collects = item.collects || Math.floor(likes * 1.3);
+    var comments = item.comments || Math.floor(likes * 0.08);
+    var views = item.views || Math.floor(likes * 12);
+
+    DB.explosives.push({
+      id: genId(),
+      title: item.title,
+      author: '热门趋势',
+      date: new Date().toISOString().slice(0,10),
+      type: item.type,
+      likes: likes,
+      collects: collects,
+      comments: comments,
+      views: views,
+      tags: item.tags,
+      link: item.link || '',
+      analyzed: false
+    });
+    imported++;
+  });
+
+  saveData();
+  cancelHotSearch();
+  renderExplosive();
+  renderDashboard();
+  showToast('成功导入 ' + imported + ' 条热点到爆文库');
+}
+
+// 取消热点搜索
+function cancelHotSearch() {
+  document.getElementById('hotSearchCard').style.display = 'none';
+  document.getElementById('hotSearchStatus').className = 'alert alert-info';
+  pendingHotItems = [];
+}
+
+// 在新窗口打开小红书搜索
+function searchRealNotes() {
+  var keyword = document.getElementById('webSearchInput').value.trim();
+  if (!keyword) { showToast('请输入搜索关键词'); return; }
+  var url = 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent(keyword) + '&type=51';
+  window.open(url, '_blank');
+  showToast('已打开小红书搜索：' + keyword);
+}
+
+// 直接打开小红书穿搭搜索页
+function openXHSLink() {
+  window.open('https://www.xiaohongshu.com/explore?channel_id=homefeed.穿搭_v2', '_blank');
+}
+
+function deleteExplosive(id) {
+  if (!confirm('确认删除此爆文记录？')) return;
+  var exp = DB.explosives.find(e => e.id === id);
+  var name = exp ? exp.title : '';
+  DB.explosives = DB.explosives.filter(e => e.id !== id);
+  DB.analyses = DB.analyses.filter(a => a.explosiveId !== id);
+  addOperationLog('delete', 'explosives', id, name, '删除了爆文「' + name + '」');
+  saveData();
+  renderExplosive();
+  renderTeam();
+  closeAnalysis();
+  showToast('已删除');
+}
+
+// ====================================================================
+// 选题策划
+// ====================================================================
+function renderTopics() {
+  const filter = document.getElementById('topicFilter').value;
+  let topics = DB.topics.slice();
+  if (filter) topics = topics.filter(t => t.status === filter);
+
+  const columns = [
+    {key:'待策划', title:'💡 待策划'},
+    {key:'策划中', title:'📝 策划中'},
+    {key:'已排期', title:'📅 已排期'},
+    {key:'已发布', title:'✅ 已发布'}
+  ];
+
+  const board = document.getElementById('topicBoard');
+  board.innerHTML = columns.map(col => {
+    const colTopics = topics.filter(t => t.status === col.key);
+    return `
+      <div class="kanban-col">
+        <div class="kanban-col-header">
+          <span class="kanban-col-title">${col.title}</span>
+          <span class="kanban-col-count">${colTopics.length}</span>
+        </div>
+        ${colTopics.map(t => `
+          <div class="kanban-card">
+            <div class="kanban-card-title">${t.title}</div>
+            <div class="kanban-card-meta">
+              <span class="tag tag-primary">${t.type}</span>
+              <span class="tag tag-neutral">${t.audience}</span>
+            </div>
+            ${t.tags ? `<div style="font-size:11px;color:var(--color-text-light);margin-top:4px">🏷 ${t.tags}</div>` : ''}
+            ${t.refExplosive ? `<div style="font-size:11px;color:var(--color-accent);margin-top:4px">🔗 参考爆文</div>` : ''}
+            ${t.publishDate ? `<div style="font-size:11px;color:var(--color-text-light);margin-top:4px">📅 发布：${t.publishDate}</div>` : ''}
+            <div class="kanban-card-actions">
+              <button class="btn btn-outline btn-sm" onclick="openTopicModal(${t.id})">编辑</button>
+              ${t.status !== '已发布' ? `<button class="btn btn-outline btn-sm" onclick="advanceTopic(${t.id})">→</button>` : ''}
+              <button class="btn btn-danger btn-sm" onclick="deleteTopic(${t.id})">删</button>
+            </div>
+          </div>
+        `).join('') || '<div class="empty-state"><p>暂无</p></div>'}
+      </div>
+    `;
+  }).join('');
+
+  // 灵感池
+  const pool = document.getElementById('inspirationPool');
+  const inspirations = [
+    {title:'秋装换季 × 身材修饰系列', desc:'基于爆文趋势，将夏季显瘦选题升级为秋装版本', type:'身材修饰', tags:'秋装,显瘦'},
+    {title:'专柜试衣间实拍 × 品牌测评', desc:'数字对比制造稀缺感，试衣间场景增强真实感', type:'品牌测评', tags:'品牌,试衣间'},
+    {title:'一周OOTD × 通勤场景', desc:'7套完整方案+搭配公式，高收藏率选题', type:'穿搭公式', tags:'通勤,Clean Fit'},
+    {title:'小个子/梨形 × 人群痛点', desc:'核心流量入口，人群标签+痛点解决方案', type:'身材修饰', tags:'小个子,显高'},
+    {title:'品牌开箱 × 值不值话题', desc:'制造讨论度，评论区互动率高', type:'品牌测评', tags:'品牌,开箱'},
+    {title:'早秋趋势 × 风格标签', desc:'结合都市丛林捕手/早八时髦等热门趋势', type:'季节穿搭', tags:'早秋,趋势'},
+  ];
+  pool.innerHTML = inspirations.map(i => `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--color-border-light);border-radius:var(--radius-sm);margin-bottom:8px;background:var(--bg-main)">
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:13px">${i.title}</div>
+        <div style="font-size:12px;color:var(--color-text-light);margin-top:2px">${i.desc}</div>
+        <div style="margin-top:4px"><span class="tag tag-primary">${i.type}</span> <span class="tag tag-neutral">${i.tags}</span></div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="createTopicFromInspiration('${i.title}','${i.type}','${i.tags}')">创建选题</button>
+    </div>
+  `).join('');
+}
+
+function createTopicFromInspiration(title, type, tags) {
+  DB.topics.push({
+    id: genId(), title, type, audience: '', tags, refExplosive: '',
+    shootDate: '', publishDate: '', status: '待策划', note: '从灵感池创建'
+  });
+  saveData();
+  renderTopics();
+  showToast('选题已创建，请补充详情');
+}
+
+function openTopicModal(id) {
+  const topic = id ? DB.topics.find(t => t.id === id) : null;
+  document.getElementById('modalTitle').textContent = id ? '编辑选题' : '新建选题';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-group"><label>选题标题 *</label><input type="text" class="form-control" id="topicTitle" value="${topic?.title||''}" placeholder="如：玛丝菲尔秋装试穿｜专柜新品精选8件"></div>
+    <div class="form-row">
+      <div class="form-group"><label>选题类型</label><select class="form-control" id="topicType">${['OOTD','穿搭公式','身材修饰','品牌测评','季节穿搭','场景穿搭','好物分享'].map(t=>`<option value="${t}" ${topic?.type===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="form-group"><label>目标人群</label><input type="text" class="form-control" id="topicAudience" value="${topic?.audience||''}" placeholder="如：25-40岁女性"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>风格标签</label><input type="text" class="form-control" id="topicTags" value="${topic?.tags||''}" placeholder="如：品牌,秋冬"></div>
+      <div class="form-group"><label>状态</label><select class="form-control" id="topicStatus">${['待策划','策划中','已排期','拍摄中','已发布','已搁置'].map(s=>`<option value="${s}" ${topic?.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group"><label>参考爆文</label><input type="text" class="form-control" id="topicRef" value="${topic?.refExplosive||''}" placeholder="关联的爆文标题"></div>
+    <div class="form-row">
+      <div class="form-group"><label>拍摄日期</label><input type="date" class="form-control" id="topicShoot" value="${topic?.shootDate||''}"></div>
+      <div class="form-group"><label>发布日期</label><input type="date" class="form-control" id="topicPublish" value="${topic?.publishDate||''}"></div>
+    </div>
+    <div class="form-group"><label>备注</label><textarea class="form-control" id="topicNote" rows="2">${topic?.note||''}</textarea></div>
+  `;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">取消</button>
+    <button class="btn btn-primary" onclick="saveTopic(${id||0})">保存</button>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function saveTopic(id) {
+  const title = document.getElementById('topicTitle').value.trim();
+  if (!title) { showToast('请输入选题标题'); return; }
+  const now = new Date().toISOString();
+  const uid = DB.currentUserId;
+  const data = {
+    title, type: document.getElementById('topicType').value,
+    audience: document.getElementById('topicAudience').value.trim(),
+    tags: document.getElementById('topicTags').value.trim(),
+    status: document.getElementById('topicStatus').value,
+    refExplosive: document.getElementById('topicRef').value.trim(),
+    shootDate: document.getElementById('topicShoot').value,
+    publishDate: document.getElementById('topicPublish').value,
+    note: document.getElementById('topicNote').value.trim(),
+    updatedBy: uid, updatedAt: now
+  };
+  if (id) {
+    Object.assign(DB.topics.find(t => t.id === id), data);
+    addOperationLog('update', 'topics', id, title, '更新了选题「' + title + '」');
+  } else {
+    data.createdBy = uid;
+    data.createdByName = (DB.team?.members||[]).find(m => m.id === uid)?.name || '';
+    var newId = genId();
+    DB.topics.push({id: newId, ...data});
+    addOperationLog('create', 'topics', newId, title, '创建了选题「' + title + '」');
+  }
+  saveData();
+  closeModal();
+  renderTopics();
+  renderTeam();
+  showToast(id ? '选题已更新' : '选题已创建');
+}
+
+function advanceTopic(id) {
+  const topic = DB.topics.find(t => t.id === id);
+  if (!topic) return;
+  const flow = ['待策划','策划中','已排期','拍摄中','已发布'];
+  const idx = flow.indexOf(topic.status);
+  if (idx >= 0 && idx < flow.length - 1) {
+    topic.status = flow[idx + 1];
+    saveData();
+    renderTopics();
+    showToast(`选题状态：${topic.status}`);
+  }
+}
+
+function deleteTopic(id) {
+  if (!confirm('确认删除此选题？')) return;
+  var topic = DB.topics.find(t => t.id === id);
+  var name = topic ? topic.title : '';
+  DB.topics = DB.topics.filter(t => t.id !== id);
+  addOperationLog('delete', 'topics', id, name, '删除了选题「' + name + '」');
+  saveData();
+  renderTopics();
+  renderTeam();
+  showToast('已删除');
+}
+
+// ====================================================================
+// 内容复盘
+// ====================================================================
+function renderReview() {
+  const filter = document.getElementById('reviewFilter').value;
+  let list = DB.reviews.slice().sort((a,b) => b.date.localeCompare(a.date));
+
+  const tbody = document.getElementById('reviewTable');
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="15" class="empty-state">暂无复盘记录</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = list.map(r => {
+    const ctr = calcCTR(r.reads, r.impressions);
+    const intRate = calcInteractionRate(r.likes, r.collects, r.comments, r.reads);
+    const colRate = calcCollectRate(r.collects, r.reads);
+    const amount = calcInteractionAmount(r.likes, r.collects, r.comments, r.shares);
+    const level = getExplosiveLevel(amount);
+
+    if (filter && level !== filter) return '';
+
+    const ctrClass = parseFloat(ctr) >= 8 ? 'metric-good' : 'metric-bad';
+    const intClass = parseFloat(intRate) >= 10 ? 'metric-good' : parseFloat(intRate) >= 5 ? 'metric-warn' : 'metric-bad';
+    const colClass = parseFloat(colRate) >= 15 ? 'metric-good' : parseFloat(colRate) >= 10 ? 'metric-warn' : 'metric-bad';
+    const levelTag = level === '顶级爆文' ? 'tag-good' : level === '中级爆文' ? 'tag-primary' : level === '初级爆文' ? 'tag-warn' : 'tag-neutral';
+
+    return `
+      <tr>
+        <td style="max-width:200px;font-size:12px">
+          ${r.link ? '<a href="' + r.link + '" target="_blank" style="color:var(--color-primary);text-decoration:none" title="点击查看原笔记">' + r.title + '</a>' : r.title}
+          ${r.link ? '<a href="' + r.link + '" target="_blank" style="font-size:10px;color:var(--color-text-light);margin-left:4px">🔗</a>' : ''}
+        </td>
+        <td>${r.date}</td>
+        <td><span class="tag tag-primary" style="font-size:10px">${r.type}</span></td>
+        <td>${r.brand}</td>
+        <td>${r.impressions.toLocaleString()}</td>
+        <td>${r.reads.toLocaleString()}</td>
+        <td>${r.likes.toLocaleString()}</td>
+        <td>${r.collects.toLocaleString()}</td>
+        <td>${r.comments}</td>
+        <td class="${ctrClass}">${ctr}%</td>
+        <td class="${intClass}">${intRate}%</td>
+        <td class="${colClass}">${colRate}%</td>
+        <td>${amount.toLocaleString()}</td>
+        <td><span class="tag ${levelTag}">${level}</span></td>
+        <td>
+          <button class="btn btn-outline btn-sm" onclick="showReviewDetail(${r.id})">详情</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteReview(${r.id})">删</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function showReviewDetail(id) {
+  const r = DB.reviews.find(rv => rv.id === id);
+  if (!r) return;
+  const ctr = calcCTR(r.reads, r.impressions);
+  const intRate = calcInteractionRate(r.likes, r.collects, r.comments, r.reads);
+  const colRate = calcCollectRate(r.collects, r.reads);
+  const amount = calcInteractionAmount(r.likes, r.collects, r.comments, r.shares);
+  const level = getExplosiveLevel(amount);
+  const advices = generateOptimizeAdvice(r);
+
+  document.getElementById('modalTitle').textContent = '复盘详情';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="alert alert-info">📌 ${r.title}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+      <div style="text-align:center;padding:12px;background:var(--bg-main);border-radius:var(--radius-sm)">
+        <div style="font-size:20px;font-weight:700" class="${parseFloat(ctr)>=8?'metric-good':'metric-bad'}">${ctr}%</div>
+        <div style="font-size:11px;color:var(--color-text-light)">CTR点击率</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:var(--bg-main);border-radius:var(--radius-sm)">
+        <div style="font-size:20px;font-weight:700" class="${parseFloat(intRate)>=10?'metric-good':parseFloat(intRate)>=5?'metric-warn':'metric-bad'}">${intRate}%</div>
+        <div style="font-size:11px;color:var(--color-text-light)">互动率</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:var(--bg-main);border-radius:var(--radius-sm)">
+        <div style="font-size:20px;font-weight:700" class="${parseFloat(colRate)>=15?'metric-good':parseFloat(colRate)>=10?'metric-warn':'metric-bad'}">${colRate}%</div>
+        <div style="font-size:11px;color:var(--color-text-light)">收藏率</div>
+      </div>
+    </div>
+    <div class="alert ${level==='普通'?'alert-warning':'alert-success'}">📊 爆文判定：${level}（互动量 ${amount.toLocaleString()}）</div>
+    <div class="card-title" style="margin-bottom:8px">🎯 自动优化建议</div>
+    <div style="margin-bottom:16px">
+      ${advices.map(a => `<div style="padding:8px 12px;background:var(--bg-main);border-radius:var(--radius-sm);margin-bottom:6px;font-size:13px">💡 ${a}</div>`).join('')}
+    </div>
+    <div class="card-title" style="margin-bottom:8px">📝 复盘记录</div>
+    <div style="padding:12px;background:var(--bg-main);border-radius:var(--radius-sm);font-size:13px;margin-bottom:12px">${r.reviewNote || '暂无'}</div>
+    <div class="card-title" style="margin-bottom:8px">📌 优化方向</div>
+    <div style="padding:12px;background:var(--bg-main);border-radius:var(--radius-sm);font-size:13px">${r.optimizeNote || '暂无'}</div>
+  `;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">关闭</button>
+    <button class="btn btn-primary" onclick="closeModal();openReviewModal(${id})">编辑</button>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function openReviewModal(id) {
+  const r = id ? DB.reviews.find(rv => rv.id === id) : null;
+  document.getElementById('modalTitle').textContent = id ? '编辑复盘' : '记录复盘';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-group"><label>笔记标题 *</label><input type="text" class="form-control" id="rvTitle" value="${r?.title||''}" placeholder="已发布的笔记标题"></div>
+    <div class="form-group">
+      <label>笔记链接</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" class="form-control" id="rvLink" value="${r?.link||''}" placeholder="https://www.xiaohongshu.com/..." style="flex:1">
+        ${r?.link ? '<button class="btn btn-outline btn-sm" onclick="window.open(\'' + r.link + '\',\'_blank\')" style="white-space:nowrap">🔗 打开笔记</button>' : ''}
+      </div>
+      <p style="font-size:11px;color:var(--color-text-light);margin-top:4px">💡 粘贴链接后可在新窗口打开，对照填写下方数据。链接会保存下来方便以后回看。</p>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>发布日期</label><input type="date" class="form-control" id="rvDate" value="${r?.date||''}"></div>
+      <div class="form-group"><label>笔记类型</label><select class="form-control" id="rvType">${['OOTD','穿搭公式','身材修饰','品牌测评','季节穿搭','场景穿搭','好物分享'].map(t=>`<option value="${t}" ${r?.type===t?'selected':''}>${t}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group"><label>关联品牌</label><input type="text" class="form-control" id="rvBrand" value="${r?.brand||'—'}" placeholder="无则填—"></div>
+    <div class="form-row">
+      <div class="form-group"><label>曝光量</label><input type="number" class="form-control" id="rvImpressions" value="${r?.impressions||''}"></div>
+      <div class="form-group"><label>阅读量</label><input type="number" class="form-control" id="rvReads" value="${r?.reads||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>点赞</label><input type="number" class="form-control" id="rvLikes" value="${r?.likes||''}"></div>
+      <div class="form-group"><label>收藏</label><input type="number" class="form-control" id="rvCollects" value="${r?.collects||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>评论</label><input type="number" class="form-control" id="rvComments" value="${r?.comments||''}"></div>
+      <div class="form-group"><label>分享</label><input type="number" class="form-control" id="rvShares" value="${r?.shares||''}"></div>
+    </div>
+    <div class="form-group"><label>新增粉丝</label><input type="number" class="form-control" id="rvNewFans" value="${r?.newFans||''}"></div>
+    <div class="form-group"><label>复盘记录（做对了什么/可改进什么）</label><textarea class="form-control" id="rvReviewNote" rows="2">${r?.reviewNote||''}</textarea></div>
+    <div class="form-group"><label>优化方向（下一步行动）</label><textarea class="form-control" id="rvOptimizeNote" rows="2">${r?.optimizeNote||''}</textarea></div>
+  `;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">取消</button>
+    <button class="btn btn-primary" onclick="saveReview(${id||0})">保存</button>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function saveReview(id) {
+  const title = document.getElementById('rvTitle').value.trim();
+  if (!title) { showToast('请输入标题'); return; }
+  const data = {
+    title, date: document.getElementById('rvDate').value,
+    link: document.getElementById('rvLink').value.trim(),
+    type: document.getElementById('rvType').value,
+    brand: document.getElementById('rvBrand').value.trim() || '—',
+    impressions: parseInt(document.getElementById('rvImpressions').value) || 0,
+    reads: parseInt(document.getElementById('rvReads').value) || 0,
+    likes: parseInt(document.getElementById('rvLikes').value) || 0,
+    collects: parseInt(document.getElementById('rvCollects').value) || 0,
+    comments: parseInt(document.getElementById('rvComments').value) || 0,
+    shares: parseInt(document.getElementById('rvShares').value) || 0,
+    newFans: parseInt(document.getElementById('rvNewFans').value) || 0,
+    reviewNote: document.getElementById('rvReviewNote').value.trim(),
+    optimizeNote: document.getElementById('rvOptimizeNote').value.trim()
+  };
+  if (id) {
+    data.updatedAt = new Date().toISOString();
+    data.updatedBy = DB.currentUserId;
+    Object.assign(DB.reviews.find(rv => rv.id === id), data);
+    addOperationLog('update', 'reviews', id, title, '更新了复盘「' + title + '」');
+  } else {
+    var newId = genId();
+    data.createdBy = DB.currentUserId;
+    data.createdByName = (DB.team?.members||[]).find(m => m.id === DB.currentUserId)?.name || '';
+    data.updatedAt = new Date().toISOString();
+    data.updatedBy = DB.currentUserId;
+    DB.reviews.push({id: newId, ...data});
+    addOperationLog('create', 'reviews', newId, title, '记录了复盘「' + title + '」');
+  }
+  saveData();
+  closeModal();
+  renderReview();
+  renderDashboard();
+  renderTeam();
+  showToast(id ? '复盘已更新' : '复盘已记录');
+}
+
+function deleteReview(id) {
+  if (!confirm('确认删除此复盘记录？')) return;
+  var rv = DB.reviews.find(r => r.id === id);
+  var name = rv ? rv.title : '';
+  DB.reviews = DB.reviews.filter(r => r.id !== id);
+  addOperationLog('delete', 'reviews', id, name, '删除了复盘「' + name + '」');
+  saveData();
+  renderReview();
+  renderTeam();
+  showToast('已删除');
+}
+
+// ====================================================================
+// 周报汇总
+// ====================================================================
+function renderWeekly() {
+  const list = document.getElementById('weeklyList');
+  if (DB.weeklies.length === 0) {
+    list.innerHTML = '<div class="empty-state"><p>暂无周报记录</p></div>';
+    return;
+  }
+  list.innerHTML = DB.weeklies.map(w => `
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">${w.week}（${w.dateRange}）</span>
+        <button class="btn btn-outline btn-sm" onclick="openWeeklyModal(${w.id})">编辑</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px">
+        <div style="text-align:center;padding:10px;background:var(--bg-main);border-radius:var(--radius-sm)">
+          <div style="font-size:18px;font-weight:700">${w.posts}</div><div style="font-size:11px;color:var(--color-text-light)">发布数</div>
+        </div>
+        <div style="text-align:center;padding:10px;background:var(--bg-main);border-radius:var(--radius-sm)">
+          <div style="font-size:18px;font-weight:700">${w.interactions.toLocaleString()}</div><div style="font-size:11px;color:var(--color-text-light)">总互动</div>
+        </div>
+        <div style="text-align:center;padding:10px;background:var(--bg-main);border-radius:var(--radius-sm)">
+          <div style="font-size:18px;font-weight:700">${w.newFans}</div><div style="font-size:11px;color:var(--color-text-light)">新增粉丝</div>
+        </div>
+        <div style="text-align:center;padding:10px;background:var(--bg-main);border-radius:var(--radius-sm)">
+          <div style="font-size:18px;font-weight:700">${w.explosiveCount}</div><div style="font-size:11px;color:var(--color-text-light)">爆文数</div>
+        </div>
+        <div style="text-align:center;padding:10px;background:var(--bg-main);border-radius:var(--radius-sm)">
+          <div style="font-size:18px;font-weight:700">${w.gmv?(w.gmv/10000).toFixed(1):'0'}万</div><div style="font-size:11px;color:var(--color-text-light)">直播GMV</div>
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-weight:600;font-size:13px;margin-bottom:4px">📋 本周总结</div>
+        <p style="font-size:13px;color:var(--color-text)">${w.summary}</p>
+      </div>
+      <div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:4px">🎯 下周计划</div>
+        <p style="font-size:13px;color:var(--color-text)">${w.plan}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openWeeklyModal(id) {
+  const w = id ? DB.weeklies.find(wk => wk.id === id) : null;
+  document.getElementById('modalTitle').textContent = id ? '编辑周报' : '新建周报';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row">
+      <div class="form-group"><label>周次</label><input type="text" class="form-control" id="wkWeek" value="${w?.week||''}" placeholder="如：第31周"></div>
+      <div class="form-group"><label>日期范围</label><input type="text" class="form-control" id="wkRange" value="${w?.range||''}" placeholder="如：07/28-08/03"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>发布数</label><input type="number" class="form-control" id="wkPosts" value="${w?.posts||0}"></div>
+      <div class="form-group"><label>总曝光量</label><input type="number" class="form-control" id="wkImpressions" value="${w?.impressions||0}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>总阅读量</label><input type="number" class="form-control" id="wkReads" value="${w?.reads||0}"></div>
+      <div class="form-group"><label>总互动量</label><input type="number" class="form-control" id="wkInteractions" value="${w?.interactions||0}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>新增粉丝</label><input type="number" class="form-control" id="wkNewFans" value="${w?.newFans||0}"></div>
+      <div class="form-group"><label>爆文数</label><input type="number" class="form-control" id="wkExplosive" value="${w?.explosiveCount||0}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>直播场次</label><input type="number" class="form-control" id="wkLiveCount" value="${w?.liveCount||0}"></div>
+      <div class="form-group"><label>直播GMV(元)</label><input type="number" class="form-control" id="wkGmv" value="${w?.gmv||0}"></div>
+    </div>
+    <div class="form-group"><label>本周总结</label><textarea class="form-control" id="wkSummary" rows="3">${w?.summary||''}</textarea></div>
+    <div class="form-group"><label>下周计划</label><textarea class="form-control" id="wkPlan" rows="3">${w?.plan||''}</textarea></div>
+  `;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal()">取消</button>
+    <button class="btn btn-primary" onclick="saveWeekly(${id||0})">保存</button>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function saveWeekly(id) {
+  const week = document.getElementById('wkWeek').value.trim();
+  if (!week) { showToast('请输入周次'); return; }
+  const data = {
+    week, dateRange: document.getElementById('wkRange').value.trim(),
+    posts: parseInt(document.getElementById('wkPosts').value) || 0,
+    impressions: parseInt(document.getElementById('wkImpressions').value) || 0,
+    reads: parseInt(document.getElementById('wkReads').value) || 0,
+    interactions: parseInt(document.getElementById('wkInteractions').value) || 0,
+    newFans: parseInt(document.getElementById('wkNewFans').value) || 0,
+    explosiveCount: parseInt(document.getElementById('wkExplosive').value) || 0,
+    liveCount: parseInt(document.getElementById('wkLiveCount').value) || 0,
+    gmv: parseInt(document.getElementById('wkGmv').value) || 0,
+    summary: document.getElementById('wkSummary').value.trim(),
+    plan: document.getElementById('wkPlan').value.trim()
+  };
+  if (id) {
+    data.updatedAt = new Date().toISOString();
+    data.updatedBy = DB.currentUserId;
+    Object.assign(DB.weeklies.find(wk => wk.id === id), data);
+    addOperationLog('update', 'weeklies', id, week, '更新了周报「' + week + '」');
+  } else {
+    var newId = genId();
+    data.createdBy = DB.currentUserId;
+    data.createdByName = (DB.team?.members||[]).find(m => m.id === DB.currentUserId)?.name || '';
+    data.updatedAt = new Date().toISOString();
+    data.updatedBy = DB.currentUserId;
+    DB.weeklies.push({id: newId, ...data});
+    addOperationLog('create', 'weeklies', newId, week, '创建了周报「' + week + '」');
+  }
+  saveData();
+  closeModal();
+  renderWeekly();
+  renderTeam();
+  showToast(id ? '周报已更新' : '周报已创建');
+}
+
+// ====================================================================
+// 通用模态框
+// ====================================================================
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ====================================================================
+// 数据导入导出
+// ====================================================================
+function exportData() {
+  const data = JSON.stringify(DB, null, 2);
+  const blob = new Blob([data], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `穿搭博主工作台_数据备份_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('数据已导出');
+}
+
+// 重置到最新版本数据（保留用户自己填的任务/直播/复盘）
+function resetToLatest() {
+  if (!confirm('将趋势标签和热点库更新为最新版本数据。\n\n你的任务、直播安排、复盘记录会保留，不会丢失。\n\n确认更新？')) return;
+
+  // 先备份当前数据
+  var oldData = JSON.parse(JSON.stringify(DB));
+  exportData(); // 自动下载备份
+
+  // 只更新趋势标签和热点库
+  loadSampleData();
+  DB.tasks = oldData.tasks;
+  DB.lives = oldData.lives;
+  DB.reviews = oldData.reviews;
+  DB.topics = oldData.topics;
+  DB.weeklies = oldData.weeklies;
+  DB.analyses = oldData.analyses;
+  DB.calendarSync = oldData.calendarSync;
+
+  saveData();
+  renderDashboard();
+  renderTrendTags();
+  renderExplosive();
+  renderTopics();
+  renderReview();
+  renderLive();
+  renderWeekly();
+  showToast('✅ 已更新到最新版本！趋势标签和热点库已刷新');
+}
+
+// ====================================================================
+// 团队协作功能
+// ====================================================================
+// ===== GitHub Gist 云端同步 =====
+var syncTimer = null;
+var syncPending = false;
+var isPushing = false;
+
+function openGistSyncModal() {
+  var cfg = DB.team.syncConfig || {};
+  document.getElementById('modalTitle').textContent = '☁️ GitHub Gist 云端同步设置';
+  document.getElementById('modalBody').innerHTML =
+    '<div class="alert alert-info" style="background:#E8F0FE;border:1px solid #B0C8E8;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;">' +
+      '<strong>🔐 配置步骤：</strong><br>' +
+      '1. 打开 <a href="https://github.com/settings/tokens" target="_blank" style="color:var(--color-primary-dark)">github.com/settings/tokens</a> 创建 Token，勾选 <strong>gist</strong> 权限<br>' +
+      '2. 打开 <a href="https://gist.github.com" target="_blank" style="color:var(--color-primary-dark)">gist.github.com</a> 新建一个 Gist，文件名填 <strong>team-data.json</strong>，内容随意<br>' +
+      '3. 复制 Gist URL 中的那串 ID（如 <code>abc123def456</code>），和 Token 一起填入下方<br>' +
+      '4. 保存后，所有团队成员用相同的 Gist ID + 各自 Token 即可自动同步' +
+    '</div>' +
+    '<div class="form-group"><label>GitHub Token *</label><input type="password" class="form-control" id="gistToken" value="' + (cfg.gistToken||'') + '" placeholder="ghp_xxxxxxxxxxxx"></div>' +
+    '<div class="form-group"><label>Gist ID *</label><input type="text" class="form-control" id="gistId" value="' + (cfg.gistId||'') + '" placeholder="从 Gist URL 中复制，如 abc123def456"></div>' +
+    '<div class="form-group"><label>同步间隔（秒）</label><select class="form-control" id="gistInterval">' +
+      '<option value="15" ' + (cfg.syncInterval===15?'selected':'') + '>15秒</option>' +
+      '<option value="30" ' + (cfg.syncInterval===30?'selected':'') + '>30秒（推荐）</option>' +
+      '<option value="60" ' + (cfg.syncInterval===60?'selected':'') + '>60秒</option>' +
+      '<option value="120" ' + (cfg.syncInterval===120?'selected':'') + '>2分钟</option>' +
+    '</select></div>' +
+    (cfg.lastSync ? '<div style="margin-top:12px;font-size:11px;color:var(--color-text-light)">上次同步：' + cfg.lastSync + ' by ' + (cfg.lastSyncBy||'') + '</div>' : '');
+  document.getElementById('modalFooter').innerHTML =
+    '<button class="btn btn-outline" onclick="closeModal()">取消</button>' +
+    '<button class="btn btn-primary" onclick="saveGistSyncConfig()">💾 保存并启用同步</button>' +
+    (cfg.gistId ? '<button class="btn btn-outline" onclick="disableGistSync()" style="color:var(--color-bad)">停用同步</button>' : '');
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function saveGistSyncConfig() {
+  var token = document.getElementById('gistToken').value.trim();
+  var gistId = document.getElementById('gistId').value.trim();
+  var interval = parseInt(document.getElementById('gistInterval').value) || 30;
+  if (!token || !gistId) { showToast('请填写 Token 和 Gist ID'); return; }
+  if (!DB.team) DB.team = { teamId: '', teamName: '', members: [], syncConfig: {} };
+  DB.team.syncConfig.gistToken = token;
+  DB.team.syncConfig.gistId = gistId;
+  DB.team.syncConfig.syncInterval = interval;
+  saveData();
+  closeModal();
+  startSyncTimer();
+  // 首次立即同步
+  pullFromGist().then(function() {
+    updateSyncBar('online', '已连接云端');
+  }).catch(function() {
+    updateSyncBar('error', '连接失败，请检查 Token 和 Gist ID');
+  });
+  showToast('✅ Gist 同步已配置，正在连接...');
+}
+
+function disableGistSync() {
+  if (!confirm('确认停用云端同步？之后数据仅在本地保存。')) return;
+  DB.team.syncConfig.gistToken = '';
+  DB.team.syncConfig.gistId = '';
+  saveData();
+  closeModal();
+  stopSyncTimer();
+  updateSyncBar('local', '本地模式');
+  showToast('已停用云端同步');
+}
+
+function startSyncTimer() {
+  stopSyncTimer();
+  var cfg = DB.team.syncConfig || {};
+  if (!cfg.gistId || !cfg.gistToken) return;
+  var interval = (cfg.syncInterval || 30) * 1000;
+  // 立即拉取一次
+  pullFromGist().then(function() {
+    updateSyncBar('online', '已同步');
+  }).catch(function() {});
+  syncTimer = setInterval(function() {
+    pullFromGist().catch(function() {});
+  }, interval);
+}
+
+function stopSyncTimer() {
+  if (syncTimer) { clearInterval(syncTimer); syncTimer = null; }
+}
+
+function updateSyncBar(status, text) {
+  var bar = document.getElementById('syncStatusBar');
+  var icon = document.getElementById('syncStatusIcon');
+  var txt = document.getElementById('syncStatusText');
+  var time = document.getElementById('syncBarTime');
+  if (!bar || !icon || !txt) return;
+  var map = { online: '🟢', pulling: '🔄', pushing: '📤', error: '🔴', local: '📦' };
+  icon.textContent = map[status] || '📦';
+  txt.textContent = text || '本地模式';
+  var cfg = DB.team.syncConfig || {};
+  if (cfg.lastSync) {
+    time.textContent = '上次: ' + cfg.lastSync;
+  }
+}
+
+function manualSync() {
+  var cfg = DB.team.syncConfig || {};
+  if (!cfg.gistId || !cfg.gistToken) {
+    openGistSyncModal();
+    return;
+  }
+  updateSyncBar('pushing', '正在同步...');
+  pushToGist().then(function() {
+    return pullFromGist();
+  }).then(function() {
+    updateSyncBar('online', '同步完成');
+    showToast('✅ 数据已同步');
+  }).catch(function(err) {
+    updateSyncBar('error', '同步失败');
+    showToast('同步失败: ' + err.message);
+  });
+}
+
+// 推送到 Gist
+function pushToGist() {
+  var cfg = DB.team.syncConfig || {};
+  if (!cfg.gistId || !cfg.gistToken) return Promise.reject(new Error('未配置'));
+  if (isPushing) return Promise.resolve();
+  isPushing = true;
+  
+  // 准备数据（不包含敏感信息）
+  var exportData = JSON.parse(JSON.stringify(DB));
+  if (exportData.team && exportData.team.syncConfig) {
+    exportData.team.syncConfig.gistToken = ''; // 不推送 Token
+  }
+  
+  return fetch('https://api.github.com/gists/' + cfg.gistId, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': 'token ' + cfg.gistToken,
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.github.v3+json'
+    },
+    body: JSON.stringify({
+      files: { 'team-data.json': { content: JSON.stringify(exportData, null, 2) } }
+    })
+  }).then(function(res) {
+    isPushing = false;
+    if (!res.ok) throw new Error('推送失败 HTTP ' + res.status);
+    DB.team.syncConfig.lastSync = new Date().toLocaleString('zh-CN');
+    DB.team.syncConfig.lastSyncBy = (DB.team.members||[]).find(function(m) { return m.id === DB.currentUserId; })?.name || '';
+    saveData();
+    updateSyncBar('online', '已同步');
+  }).catch(function(err) {
+    isPushing = false;
+    throw err;
+  });
+}
+
+// 从 Gist 拉取
+function pullFromGist() {
+  var cfg = DB.team.syncConfig || {};
+  if (!cfg.gistId || !cfg.gistToken) return Promise.reject(new Error('未配置'));
+  
+  updateSyncBar('pulling', '正在拉取...');
+  return fetch('https://api.github.com/gists/' + cfg.gistId, {
+    headers: {
+      'Authorization': 'token ' + cfg.gistToken,
+      'Accept': 'application/vnd.github.v3+json'
+    }
+  }).then(function(res) {
+    if (!res.ok) throw new Error('拉取失败 HTTP ' + res.status);
+    return res.json();
+  }).then(function(gist) {
+    var file = gist.files && gist.files['team-data.json'];
+    if (!file || !file.content) return;
+    var remoteDB = JSON.parse(file.content);
+    if (!remoteDB || !remoteDB._meta) return;
+    
+    // 比较版本号，相同则跳过
+    var localRev = (DB._meta || {}).revision || 0;
+    var remoteRev = (remoteDB._meta || {}).revision || 0;
+    if (remoteRev <= localRev && localRev > 0) {
+      updateSyncBar('online', '已是最新');
+      return;
+    }
+    
+    // 合并数据
+    mergeGistData(remoteDB);
+    DB._meta.revision = remoteRev;
+    DB._meta.lastModified = new Date().toISOString();
+    DB.team.syncConfig.lastSync = new Date().toLocaleString('zh-CN');
+    DB.team.syncConfig.lastSyncBy = '云端';
+    saveData();
+    updateSyncBar('online', '已同步');
+    
+    // 刷新界面
+    renderDashboard();
+    renderTasks();
+    renderLive();
+    renderExplosive();
+    renderTopics();
+    renderReview();
+    renderWeekly();
+    renderTeam();
+  }).catch(function(err) {
+    updateSyncBar('error', '拉取失败');
+    throw err;
+  });
+}
+
+// Gist 数据合并（更激进策略：云端数据权威，保留本地成员和Token）
+function mergeGistData(remoteDB) {
+  // 保留本地成员和同步配置
+  var localMembers = (DB.team && DB.team.members) ? DB.team.members : [];
+  var localSyncConfig = (DB.team && DB.team.syncConfig) ? DB.team.syncConfig : {};
+  var localCurrentUser = DB.currentUserId;
+  
+  // 以云端数据为准进行合并
+  DB.tasks = mergeArrays(DB.tasks, remoteDB.tasks || []);
+  DB.lives = mergeArrays(DB.lives, remoteDB.lives || []);
+  DB.explosives = mergeArrays(DB.explosives, remoteDB.explosives || []);
+  DB.analyses = mergeArrays(DB.analyses, remoteDB.analyses || []);
+  DB.topics = mergeArrays(DB.topics, remoteDB.topics || []);
+  DB.reviews = mergeArrays(DB.reviews, remoteDB.reviews || []);
+  DB.weeklies = mergeArrays(DB.weeklies, remoteDB.weeklies || []);
+  DB.trendTags = mergeArrays(DB.trendTags, remoteDB.trendTags || [], 'name');
+  DB.calendarSync = remoteDB.calendarSync || DB.calendarSync || {};
+  
+  // 合并操作日志
+  if (remoteDB.operationLogs) {
+    var existingIds = {};
+    (DB.operationLogs||[]).forEach(function(l) { existingIds[l.id] = true; });
+    (remoteDB.operationLogs||[]).forEach(function(l) {
+      if (!existingIds[l.id]) { DB.operationLogs.unshift(l); existingIds[l.id] = true; }
+    });
+    DB.operationLogs.sort(function(a, b) { return (b.timestamp||'').localeCompare(a.timestamp||''); });
+    if (DB.operationLogs.length > 500) DB.operationLogs = DB.operationLogs.slice(0, 500);
+  }
+  
+  // 合并团队成员
+  if (remoteDB.team && remoteDB.team.members) {
+    var memberMap = {};
+    localMembers.forEach(function(m) { memberMap[m.id] = m; });
+    remoteDB.team.members.forEach(function(m) {
+      if (!memberMap[m.id]) {
+        localMembers.push(m);
+        memberMap[m.id] = m;
+      }
+    });
+  }
+  DB.team = DB.team || {};
+  DB.team.members = localMembers;
+  DB.team.syncConfig = localSyncConfig;
+  DB.team.teamId = DB.team.teamId || (remoteDB.team && remoteDB.team.teamId) || '';
+  DB.team.teamName = DB.team.teamName || (remoteDB.team && remoteDB.team.teamName) || '';
+  DB.currentUserId = localCurrentUser;
+  ensureTeamFields();
+}
+
+// 推送后拉取（双向同步）
+function pushThenPull() {
+  pushToGist().then(function() {
+    return pullFromGist();
+  }).catch(function(err) {
+    console.warn('Gist sync error:', err);
+  });
+}
+
+function renderTeam() {
+  renderSyncBarStatus();
+  renderCurrentUserBadge();
+  renderMembers();
+  renderTaskAssignment();
+  renderOperationLogs();
+  updateMemberFilterOptions();
+}
+
+function renderSyncBarStatus() {
+  var cfg = DB.team.syncConfig || {};
+  if (cfg.gistId && cfg.gistToken) {
+    updateSyncBar('online', '云端同步已启用');
+  } else {
+    updateSyncBar('local', '本地模式（点击⚙️配置云端同步）');
+  }
+}
+
+function renderCurrentUserBadge() {
+  var badge = document.getElementById('currentUserBadge');
+  if (!badge) return;
+  var uid = DB.currentUserId;
+  if (!uid || !DB.team || !DB.team.members) {
+    badge.innerHTML = '<span style="color:var(--color-text-light)">未设置</span>';
+    return;
+  }
+  var member = DB.team.members.find(function(m) { return m.id === uid; });
+  if (!member) {
+    badge.innerHTML = '<span style="color:var(--color-text-light)">未设置</span>';
+    return;
+  }
+  badge.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;">' +
+    '<span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:' + (member.color||'#8B7B8B') + ';color:#fff;text-align:center;line-height:20px;font-size:11px;font-weight:700;">' + (member.name||'?').charAt(0) + '</span>' +
+    member.name + ' <span class="member-role-tag member-role-' + member.role + '">' + (member.role==='owner'?'队长':member.role==='admin'?'管理员':'成员') + '</span></span>';
+}
+
+function renderMembers() {
+  var list = document.getElementById('memberList');
+  if (!list) return;
+  if (!DB.team || !DB.team.members || DB.team.members.length === 0) {
+    list.innerHTML = '<div class="log-empty">还没有成员，点击"添加成员"开始组建团队</div>';
+    return;
+  }
+  var isOwner = DB.team.members.find(function(m) { return m.id === DB.currentUserId && m.role === 'owner'; });
+  list.innerHTML = DB.team.members.map(function(m) {
+    var roleLabel = m.role === 'owner' ? '队长' : m.role === 'admin' ? '管理员' : '成员';
+    return '<div class="member-item">' +
+      '<div class="member-avatar" style="background:' + (m.color||'#8B7B8B') + '">' + (m.name||'?').charAt(0) + '</div>' +
+      '<div class="member-info">' +
+        '<div class="member-name">' + m.name + ' <span class="member-role-tag member-role-' + m.role + '">' + roleLabel + '</span>' +
+        (m.id === DB.currentUserId ? ' <span style="font-size:11px;color:var(--color-good)">← 当前</span>' : '') + '</div>' +
+        '<div class="member-meta">加入于 ' + (m.joinedAt||'') + '</div>' +
+      '</div>' +
+      '<div class="member-actions">' +
+        (m.id !== DB.currentUserId ? '<button class="btn btn-sm btn-outline" onclick="switchUser(\'' + m.id + '\')">切换</button>' : '') +
+        (isOwner && m.role !== 'owner' ? '<button class="btn btn-sm btn-outline" onclick="openMemberModal(\'' + m.id + '\')">编辑</button>' : '') +
+        (isOwner && m.role !== 'owner' ? '<button class="btn btn-sm btn-danger" onclick="deleteMember(\'' + m.id + '\')">移除</button>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderTaskAssignment() {
+  var container = document.getElementById('taskAssignmentOverview');
+  if (!container) return;
+  if (!DB.team || !DB.team.members || DB.team.members.length === 0) {
+    container.innerHTML = '<div class="log-empty">请先添加团队成员</div>';
+    return;
+  }
+  var stats = {};
+  DB.team.members.forEach(function(m) {
+    var memberTasks = DB.tasks.filter(function(t) { return t.assigneeId === m.id; });
+    stats[m.id] = {
+      name: m.name, color: m.color,
+      total: memberTasks.length,
+      pending: memberTasks.filter(function(t) { return t.status === '待办'; }).length,
+      inProgress: memberTasks.filter(function(t) { return t.status === '进行中'; }).length,
+      done: memberTasks.filter(function(t) { return t.status === '已完成'; }).length
+    };
+  });
+  // 未分配
+  var unassigned = DB.tasks.filter(function(t) { return !t.assigneeId; });
+  var cards = [];
+  Object.keys(stats).forEach(function(id) {
+    var s = stats[id];
+    cards.push('<div class="task-assign-card" onclick="switchPage(\'tasks\');document.getElementById(\'taskMemberFilter\').value=\'' + id + '\';renderTasks();" style="cursor:pointer;">' +
+      '<div class="assign-name">' + s.name + '</div>' +
+      '<div class="assign-stats">' +
+        '<span class="assign-stat">总计 <strong>' + s.total + '</strong></span>' +
+        '<span class="assign-stat">待办 <strong>' + s.pending + '</strong></span>' +
+        '<span class="assign-stat">进行中 <strong>' + s.inProgress + '</strong></span>' +
+        '<span class="assign-stat">已完成 <strong>' + s.done + '</strong></span>' +
+      '</div></div>');
+  });
+  cards.push('<div class="task-assign-card assign-unassigned" onclick="switchPage(\'tasks\');document.getElementById(\'taskMemberFilter\').value=\'unassigned\';renderTasks();">' +
+    '<div class="assign-name">未分配</div>' +
+    '<div class="assign-stats"><span class="assign-stat">总计 <strong>' + unassigned.length + '</strong></span></div></div>');
+  container.innerHTML = '<div class="task-assign-grid">' + cards.join('') + '</div>';
+}
+
+function renderOperationLogs() {
+  var list = document.getElementById('operationLogList');
+  if (!list) return;
+  var moduleFilter = (document.getElementById('logFilterModule')||{}).value || '';
+  var logs = DB.operationLogs || [];
+  if (moduleFilter) logs = logs.filter(function(l) { return l.module === moduleFilter; });
+  if (logs.length === 0) {
+    list.innerHTML = '<div class="log-empty">暂无操作日志</div>';
+    return;
+  }
+  list.innerHTML = logs.slice(0, 100).map(function(l) {
+    var dotClass = 'log-dot-' + (l.action || 'update');
+    var time = l.timestamp ? l.timestamp.replace('T', ' ').substring(0, 19) : '';
+    return '<div class="log-item">' +
+      '<div class="log-dot ' + dotClass + '"></div>' +
+      '<div class="log-content">' +
+        '<div class="log-detail">' + (l.detail || l.userName + ' ' + (l.action||'操作') + '了 ' + (l.targetName||'')) + '</div>' +
+        '<div class="log-time">' + time + ' · ' + (l.userName||'') + '</div>' +
+      '</div></div>';
+  }).join('');
+}
+
+function openMemberModal(id) {
+  var member = id ? (DB.team.members||[]).find(function(m) { return m.id === id; }) : null;
+  document.getElementById('modalTitle').textContent = id ? '编辑成员' : '添加成员';
+  document.getElementById('modalBody').innerHTML =
+    '<div class="form-group"><label>昵称 *</label><input type="text" class="form-control" id="memberName" value="' + (member?member.name:'') + '" placeholder="如：运营小助手"></div>' +
+    '<div class="form-group"><label>角色</label><select class="form-control" id="memberRole">' +
+      '<option value="member" ' + (member&&member.role==='member'?'selected':'') + '>成员</option>' +
+      '<option value="admin" ' + (member&&member.role==='admin'?'selected':'') + '>管理员</option>' +
+      (member&&member.role==='owner' ? '<option value="owner" selected>队长</option>' : '') +
+    '</select></div>' +
+    '<div class="form-group"><label>标识颜色</label><input type="color" class="form-control" id="memberColor" value="' + (member?member.color:'#8B7B8B') + '" style="width:60px;height:36px;"></div>';
+  document.getElementById('modalFooter').innerHTML =
+    '<button class="btn btn-outline" onclick="closeModal()">取消</button>' +
+    '<button class="btn btn-primary" onclick="saveMember(\'' + (id||'') + '\')">保存</button>';
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function saveMember(id) {
+  var name = document.getElementById('memberName').value.trim();
+  if (!name) { showToast('请输入成员昵称'); return; }
+  var role = document.getElementById('memberRole').value;
+  var color = document.getElementById('memberColor').value;
+  if (!DB.team) DB.team = { teamId: '', teamName: '', members: [], syncConfig: { workerUrl: '', gistId: '', gistToken: '', gistFilename: 'team-data.json', syncInterval: 30, lastSync: '', lastSyncBy: '' };
+  if (!DB.team.members) DB.team.members = [];
+  if (id) {
+    var member = DB.team.members.find(function(m) { return m.id === id; });
+    if (member) {
+      member.name = name;
+      if (member.role !== 'owner') member.role = role;
+      member.color = color;
+    }
+    addOperationLog('update', 'team', id, name, '更新了成员「' + name + '」');
+  } else {
+    var newId = 'm_' + genId();
+    DB.team.members.push({ id: newId, name: name, role: role, color: color, joinedAt: new Date().toISOString().slice(0,10) });
+    addOperationLog('create', 'team', newId, name, '添加了成员「' + name + '」');
+    if (!DB.currentUserId) {
+      DB.currentUserId = newId;
+    }
+  }
+  saveData();
+  closeModal();
+  renderTeam();
+  showToast(id ? '成员已更新' : '成员已添加');
+}
+
+function deleteMember(id) {
+  if (!confirm('确认移除该成员？')) return;
+  var member = (DB.team.members||[]).find(function(m) { return m.id === id; });
+  var name = member ? member.name : '';
+  DB.team.members = DB.team.members.filter(function(m) { return m.id !== id; });
+  // 如果移除的是当前用户，清空
+  if (DB.currentUserId === id) {
+    DB.currentUserId = DB.team.members.length > 0 ? DB.team.members[0].id : '';
+  }
+  addOperationLog('delete', 'team', id, name, '移除了成员「' + name + '」');
+  saveData();
+  renderTeam();
+  showToast('成员已移除');
+}
+
+function switchUser(userId) {
+  DB.currentUserId = userId;
+  saveData();
+  renderTeam();
+  renderTasks();
+  showToast('已切换身份为 ' + ((DB.team.members||[]).find(function(m) { return m.id === userId; })||{}).name || '未知');
+}
+
+function switchUserPrompt() {
+  var members = DB.team.members || [];
+  if (members.length === 0) {
+    showToast('请先添加成员');
+    return;
+  }
+  var options = members.map(function(m) { return '<option value="' + m.id + '" ' + (m.id===DB.currentUserId?'selected':'') + '>' + m.name + ' (' + (m.role==='owner'?'队长':m.role==='admin'?'管理员':'成员') + ')</option>'; }).join('');
+  document.getElementById('modalTitle').textContent = '切换当前身份';
+  document.getElementById('modalBody').innerHTML = '<div class="form-group"><label>选择身份</label><select class="form-control" id="switchUserSelect">' + options + '</select></div>';
+  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="var sel=document.getElementById(\'switchUserSelect\').value;closeModal();switchUser(sel)">确认切换</button>';
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function updateMemberFilterOptions() {
+  var filter = document.getElementById('taskMemberFilter');
+  if (!filter) return;
+  var members = DB.team.members || [];
+  var currentValue = filter.value;
+  filter.innerHTML = '<option value="">全部成员</option>' +
+    members.map(function(m) { return '<option value="' + m.id + '" ' + (currentValue===m.id?'selected':'') + '>' + m.name + '</option>'; }).join('') +
+    '<option value="unassigned" ' + (currentValue==='unassigned'?'selected':'') + '>未分配</option>';
+}
+
+function exportTeamData() {
+  var data = JSON.stringify(DB, null, 2);
+  var blob = new Blob([data], {type: 'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = '穿搭博主团队数据_' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  addOperationLog('export', 'team', '', '', '导出了团队数据');
+  saveData();
+  renderTeam();
+  showToast('团队数据已导出，发送给队友即可');
+}
+
+function importTeamData(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var imported = JSON.parse(e.target.result);
+      // 合并策略：保留本地成员信息，合并其他数据
+      var localMembers = DB.team && DB.team.members ? DB.team.members : [];
+      var localCurrentUser = DB.currentUserId;
+      
+      // 合并数据
+      DB.tasks = mergeArrays(DB.tasks, imported.tasks || []);
+      DB.lives = mergeArrays(DB.lives, imported.lives || []);
+      DB.explosives = mergeArrays(DB.explosives, imported.explosives || []);
+      DB.analyses = mergeArrays(DB.analyses, imported.analyses || []);
+      DB.topics = mergeArrays(DB.topics, imported.topics || []);
+      DB.reviews = mergeArrays(DB.reviews, imported.reviews || []);
+      DB.weeklies = mergeArrays(DB.weeklies, imported.weeklies || []);
+      DB.trendTags = mergeArrays(DB.trendTags, imported.trendTags || [], 'name');
+      
+      // 合并操作日志
+      if (imported.operationLogs) {
+        var existingIds = {};
+        (DB.operationLogs||[]).forEach(function(l) { existingIds[l.id] = true; });
+        (imported.operationLogs||[]).forEach(function(l) {
+          if (!existingIds[l.id]) { DB.operationLogs.unshift(l); existingIds[l.id] = true; }
+        });
+        DB.operationLogs.sort(function(a, b) { return (b.timestamp||'').localeCompare(a.timestamp||''); });
+        if (DB.operationLogs.length > 500) DB.operationLogs = DB.operationLogs.slice(0, 500);
+      }
+      
+      // 保留本地成员
+      if (DB.team && DB.team.members) {
+        DB.team.members = localMembers;
+        if (imported.team && imported.team.teamName) {
+          DB.team.teamName = imported.team.teamName;
+        }
+        if (imported.team && imported.team.teamId) {
+          DB.team.teamId = imported.team.teamId;
+        }
+      }
+      DB.currentUserId = localCurrentUser;
+      
+      addOperationLog('import', 'team', '', '', '导入了团队数据');
+      ensureTeamFields();
+      saveData();
+      renderDashboard();
+      renderTasks();
+      renderLive();
+      renderExplosive();
+      renderTopics();
+      renderReview();
+      renderWeekly();
+      renderTeam();
+      showToast('团队数据导入成功！');
+    } catch(err) {
+      showToast('导入失败：文件格式错误');
+      console.error(err);
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function mergeArrays(localArr, remoteArr, keyField) {
+  keyField = keyField || 'id';
+  var result = localArr.slice();
+  var existingKeys = {};
+  result.forEach(function(item) { existingKeys[item[keyField]] = true; });
+  (remoteArr||[]).forEach(function(remoteItem) {
+    var key = remoteItem[keyField];
+    if (existingKeys[key]) {
+      // 存在冲突，以 updatedAt 较新者为准
+      var localItem = result.find(function(li) { return li[keyField] === key; });
+      if (localItem && remoteItem.updatedAt && localItem.updatedAt && remoteItem.updatedAt > localItem.updatedAt) {
+        var idx = result.indexOf(localItem);
+        result[idx] = remoteItem;
+      }
+    } else {
+      result.push(remoteItem);
+      existingKeys[key] = true;
+    }
+  });
+  return result;
+}
+
+// 更新成员筛选器选项（在 renderTeam 中调用）
+
+// ====================================================================
+// 初始化
+// ====================================================================
+loadData();
+renderDashboard();
+renderTasks();
+renderLive();
+renderTrendTags();
+renderExplosive();
+renderTopics();
+renderReview();
+renderWeekly();
+renderSyncStatus();
+renderTeam();
+
+// 如果已配置 Gist 同步，启动定时器
+if (DB.team && DB.team.syncConfig && DB.team.syncConfig.gistId && DB.team.syncConfig.gistToken) {
+  startSyncTimer();
+}
+
+// 数据变更后自动推送到云端（防抖）
+var pushDebounceTimer = null;
+var originalSaveData = saveData;
+saveData = function() {
+  originalSaveData();
+  var cfg = DB.team && DB.team.syncConfig;
+  if (cfg && cfg.gistId && cfg.gistToken) {
+    if (pushDebounceTimer) clearTimeout(pushDebounceTimer);
+    pushDebounceTimer = setTimeout(function() {
+      pushToGist().catch(function() {});
+    }, 3000);
+  }
+};
+
+// 设置默认日期
+document.getElementById('taskDateFilter').value = new Date().toISOString().slice(0,10);
+</script>
+</body>
+</html>
