@@ -1649,7 +1649,7 @@ function loadData() {
     try {
       DB = JSON.parse(saved);
       // 向后兼容：补充可能缺失的新字段
-      if (!DB.team) DB.team = { teamId: '', teamName: '', members: [], syncConfig: { workerUrl: '', gistId: '', gistToken: '', gistFilename: 'team-data.json', syncInterval: 30, lastSync: '', lastSyncBy: '' };
+      if (!DB.team) DB.team = { teamId: '', teamName: '', members: [], syncConfig: { workerUrl: '', gistId: '', gistToken: '', gistFilename: 'team-data.json', syncInterval: 30, lastSync: '', lastSyncBy: '' } };
       if (!DB.currentUserId) DB.currentUserId = '';
       if (!DB.operationLogs) DB.operationLogs = [];
       if (!DB._meta) DB._meta = { version: 2, lastModified: '', revision: 0 };
@@ -4599,7 +4599,7 @@ function saveMember(id) {
   if (!name) { showToast('请输入成员昵称'); return; }
   var role = document.getElementById('memberRole').value;
   var color = document.getElementById('memberColor').value;
-  if (!DB.team) DB.team = { teamId: '', teamName: '', members: [], syncConfig: { workerUrl: '', gistId: '', gistToken: '', gistFilename: 'team-data.json', syncInterval: 30, lastSync: '', lastSyncBy: '' };
+  if (!DB.team) DB.team = { teamId: '', teamName: '', members: [], syncConfig: { workerUrl: '', gistId: '', gistToken: '', gistFilename: 'team-data.json', syncInterval: 30, lastSync: '', lastSyncBy: '' } };
   if (!DB.team.members) DB.team.members = [];
   if (id) {
     var member = DB.team.members.find(function(m) { return m.id === id; });
