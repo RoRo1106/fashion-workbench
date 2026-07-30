@@ -1489,7 +1489,8 @@ select.form-control { cursor: pointer; }
         <span id="syncStatusIcon">📦</span>
         <span id="syncStatusText">本地模式</span>
         <span class="sync-bar-time" id="syncBarTime"></span>
-        <button class="btn btn-sm" onclick="openGistSyncModal()" style="margin-left:8px;">⚙️ 云端同步设置</button>
+        <button class="btn btn-sm" onclick="checkForUpdate()" style="margin-left:8px;background:#E8F0FE;color:#4A7AB5;border:1px solid:#B0C8E8;">🆕 检查更新</button>
+        <button class="btn btn-sm" onclick="openGistSyncModal()" style="margin-left:4px;">⚙️ 云端同步设置</button>
         <button class="btn btn-sm btn-primary" onclick="manualSync()" id="btnManualSync" style="margin-left:4px;">🔄 立即同步</button>
       </div>
 
@@ -4289,6 +4290,90 @@ function updateSyncBar(status, text) {
   if (cfg.lastSync) {
     time.textContent = '上次: ' + cfg.lastSync;
   }
+}
+
+// 检查版本更新（从 GitHub 仓库获取最新版本号）
+var CURRENT_VERSION = '2026.07.30';
+var UPDATE_REPO = 'RoRo1106/fashion-workbench';
+
+function checkForUpdate() {
+  showToast('🔍 正在检查更新...');
+  // 从 GitHub API 获取仓库最新 commit
+  fetch('https://api.github.com/repos/' + UPDATE_REPO + '/commits/main?per_page=1', {
+    headers: { 'Accept': 'application/vnd.github.v3+json' }
+  }).then(function(res) {
+    if (!res.ok) throw new Error('无法连接更新服务器');
+    return res.json();
+  }).then(function(data) {
+    var latestCommit = data.sha.substring(0, 7);
+    var commitDate = data.commit.committer.date.substring(0, 10);
+    var currentCommit = localStorage.getItem('workbench_commit_hash') || '';
+
+    if (latestCommit !== currentCommit) {
+      showUpdateConfirm(latestCommit, commitDate, data.html_url);
+    } else {
+      showToast('✅ 已是最新版本 (' + commitDate + ')');
+    }
+  }).catch(function(err) {
+    showToast('⚠️ 检查更新失败：' + err.message + '。请确保网络可访问 GitHub API');
+  });
+}
+
+function showUpdateConfirm(newHash, newDate, repoUrl) {
+  document.getElementById('modalTitle').textContent = '🆕 发现新版本';
+  document.getElementById('modalBody').innerHTML =
+    '<div style="text-align:center;padding:8px">' +
+      '<div style="font-size:48px;margin-bottom:12px">🔄</div>' +
+      '<p style="font-size:15px;margin-bottom:6px"><strong>新版本：' + newDate + '</strong> (' + newHash + ')</p>' +
+      '<p style="font-size:13px;color:var(--color-text-light);margin-bottom:16px">更新会保留你所有的数据，仅替换程序文件</p>' +
+      '<div class="alert alert-info" style="text-align:left;font-size:12px;margin-bottom:16px">' +
+        '<strong>📋 更新步骤：</strong><br>' +
+        '1. 点击下方按钮打开下载页面<br>' +
+        '2. 下载最新的 index.html 文件<br>' +
+        '3. 替换手机/电脑上的旧文件<br>' +
+        '4. 你的数据会自动从云端恢复（需配置了 Gist 同步）' +
+      '</div>' +
+    '</div>';
+  document.getElementById('modalFooter').innerHTML =
+    '<button class="btn btn-outline" onclick="closeModal()">稍后更新</button>' +
+    '<button class="btn btn-primary" onclick="doUpdate(\'' + newHash + '\')">📥 立即更新</button>';
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function doUpdate(newHash) {
+  // 先备份当前数据到 Gist
+  var cfg = DB.team.syncConfig || {};
+  if (cfg.gistId && cfg.gistToken) {
+    updateSyncBar('pushing', '正在备份数据...');
+    pushToGist().then(function() {
+      proceedUpdate(newHash);
+    }).catch(function() {
+      proceedUpdate(newHash);
+    });
+  } else {
+    proceedUpdate(newHash);
+  }
+}
+
+function proceedUpdate(newHash) {
+  // 导出当前数据
+  var backup = JSON.stringify(DB, null, 2);
+  var blob = new Blob([backup], {type: 'application/json'});
+  var backupUrl = URL.createObjectURL(blob);
+  var backupLink = document.createElement('a');
+  backupLink.href = backupUrl;
+  backupLink.download = '工作台数据备份_' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(backupLink);
+  backupLink.click();
+  document.body.removeChild(backupLink);
+  URL.revokeObjectURL(backupUrl);
+
+  // 打开最新版下载链接
+  window.open('https://raw.githubusercontent.com/' + UPDATE_REPO + '/main/index.html', '_blank');
+  
+  localStorage.setItem('workbench_commit_hash', newHash);
+  closeModal();
+  showToast('✅ 数据已备份！请在打开的页面中下载最新版本，替换旧文件即可');
 }
 
 function manualSync() {
